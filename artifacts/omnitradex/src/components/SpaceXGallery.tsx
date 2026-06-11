@@ -1,51 +1,49 @@
 import { useState, useEffect, useRef } from 'react';
-import { ExternalLink, Volume2, VolumeX } from 'lucide-react';
-import falconNightVideo from '../assets/spacex/falcon9-night-launch.mp4';
-import starshipVideo from '../assets/spacex/starship-ascent.mp4';
-import falconStill from '../assets/spacex/falcon9-launch.png';
-import starshipStill from '../assets/spacex/starship.png';
-import starlinkImg from '../assets/spacex/starlink-constellation.png';
-import earthImg from '../assets/spacex/earth-orbit.png';
-import milkywayImg from '../assets/spacex/milkyway-launch.png';
-import stationImg from '../assets/spacex/orbital-station.png';
+import { ExternalLink, Play } from 'lucide-react';
+import falconNight from '../assets/spacex/real-falcon9-night.jpg';
+import falconDay from '../assets/spacex/real-falcon9-day.jpg';
+import dragonEarth from '../assets/spacex/real-dragon-earth.jpg';
+import crewLaunch from '../assets/spacex/real-crew-launch.jpg';
+import dragonDocking from '../assets/spacex/real-dragon-docking.jpg';
+import starshipImg from '../assets/spacex/real-starship.jpg';
 
 const GALLERY = [
   {
-    img: falconStill,
-    video: falconNightVideo,
-    title: 'Falcon 9 Night Launch',
-    sub: 'T+0:00 · Kennedy Space Center',
+    img: falconNight,
+    videoUrl: 'https://www.youtube.com/watch?v=84Nct_Q9Lqw',
+    title: 'Falcon 9 · Starlink Mission',
+    sub: 'Official SpaceX webcast · watch on YouTube',
     span: 'col-span-2 row-span-2',
   },
   {
-    img: starlinkImg,
+    img: falconDay,
     title: 'Deep Space Operations',
     sub: 'Starlink Mega-Constellation',
     span: 'col-span-1 row-span-1',
   },
   {
-    img: earthImg,
+    img: dragonEarth,
     title: 'Earth from Orbit',
     sub: 'Dragon Crew · ISS Approach',
     span: 'col-span-1 row-span-1',
   },
   {
-    img: milkywayImg,
-    title: 'Milky Way · Launch Window',
-    sub: 'Booster Recovery · LZ-1',
+    img: crewLaunch,
+    title: 'Crew Dragon Launch',
+    sub: 'Crew-10 · LC-39A Kennedy',
     span: 'col-span-1 row-span-1',
   },
   {
-    img: stationImg,
+    img: dragonDocking,
     title: 'Orbital Station',
     sub: 'Dragon Docking · 400km Altitude',
     span: 'col-span-1 row-span-1',
   },
   {
-    img: starshipStill,
-    video: starshipVideo,
-    title: 'Starship Ascent',
-    sub: 'IFT-8 · Full Stack Integration',
+    img: starshipImg,
+    videoUrl: 'https://www.youtube.com/watch?v=CMGiNKcVSek',
+    title: 'Starship · Flight Test',
+    sub: 'Official SpaceX webcast · watch on YouTube',
     span: 'col-span-2 row-span-1',
   },
 ] as const;
@@ -58,10 +56,8 @@ interface GalleryCardProps {
 function GalleryCard({ item, index }: GalleryCardProps) {
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [muted, setMuted] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hasVideo = 'video' in item && Boolean(item.video);
+  const videoUrl = 'videoUrl' in item ? item.videoUrl : undefined;
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
@@ -71,19 +67,10 @@ function GalleryCard({ item, index }: GalleryCardProps) {
     return () => obs.disconnect();
   }, []);
 
-  const toggleSound = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    const next = !muted;
-    setMuted(next);
-    v.muted = next;
-    if (!next) { v.play().catch(() => {}); }
-  };
-
   return (
     <div
       ref={ref}
-      className={`relative overflow-hidden rounded-2xl cursor-pointer group ${item.span}`}
+      className={`relative overflow-hidden rounded-2xl group ${item.span} ${videoUrl ? 'cursor-pointer' : ''}`}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.97)',
@@ -93,34 +80,16 @@ function GalleryCard({ item, index }: GalleryCardProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Video (auto-playing) or Photo */}
-      {hasVideo ? (
-        <video
-          ref={videoRef}
-          src={item.video}
-          poster={item.img}
-          autoPlay
-          loop
-          muted={muted}
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
-            transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
-          }}
-        />
-      ) : (
-        <img
-          src={item.img}
-          alt={item.title}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
-            transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
-          }}
-        />
-      )}
+      {/* Photo (real SpaceX imagery / video poster) */}
+      <img
+        src={item.img}
+        alt={item.title}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{
+          transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
+          transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
+        }}
+      />
 
       {/* Base gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -152,24 +121,28 @@ function GalleryCard({ item, index }: GalleryCardProps) {
         }}
       />
 
-      {/* Live badge + sound toggle for video items */}
-      {hasVideo && (
+      {/* Video tile: play button, badge + full-card link to the real SpaceX video */}
+      {videoUrl && (
         <>
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/15">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-white text-[9px] font-bold uppercase tracking-widest">Live</span>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div
+              className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm border-2 border-white/70 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:border-cyan-400"
+              style={{ boxShadow: '0 0 30px rgba(34,211,238,0.35)' }}
+            >
+              <Play className="w-6 h-6 text-white translate-x-0.5" fill="currentColor" />
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); toggleSound(); }}
-            aria-label={muted ? 'Unmute video' : 'Mute video'}
-            className="absolute bottom-4 right-4 z-10 w-10 h-10 rounded-full border-2 border-white/60 bg-black/45 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-cyan-400"
-            style={{ boxShadow: '0 0 24px rgba(34,211,238,0.3)' }}
-          >
-            {muted
-              ? <VolumeX className="w-4 h-4 text-white" />
-              : <Volume2 className="w-4 h-4 text-cyan-300" />}
-          </button>
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/80 backdrop-blur-sm border border-white/15">
+            <Play className="w-2.5 h-2.5 text-white" fill="currentColor" />
+            <span className="text-white text-[9px] font-bold uppercase tracking-widest">Watch</span>
+          </div>
+          <a
+            href={videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Watch ${item.title} on YouTube`}
+            className="absolute inset-0 z-20 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          />
         </>
       )}
 

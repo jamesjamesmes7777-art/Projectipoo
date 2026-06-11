@@ -3,8 +3,9 @@ import { TrendingUp, ChevronRight, CalendarDays, Rocket } from 'lucide-react';
 import StarField from './StarField';
 import { useLang } from '../context/LangContext';
 import { useAllocation } from './AllocationModal';
+import heroBg from '../assets/spacex/real-dragon-earth.jpg';
 
-const HERO_BG = 'https://images.pexels.com/photos/586063/pexels-photo-586063.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80';
+const HERO_BG = heroBg;
 
 function getTimeUntil(target: Date) {
   const now = new Date();

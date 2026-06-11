@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Rocket, Satellite, Globe2, ArrowUpRight } from 'lucide-react';
 import { useLang } from '../context/LangContext';
-import falconStill from '../assets/spacex/falcon9-launch.png';
-import starlinkImg from '../assets/spacex/starlink-constellation.png';
-import starshipStill from '../assets/spacex/starship.png';
+import falconStill from '../assets/spacex/real-falcon9-day.jpg';
+import starlinkImg from '../assets/spacex/real-video-starlink.jpg';
+import starshipStill from '../assets/spacex/real-starship.jpg';
 
 const MISSION_PHOTOS = [falconStill, starlinkImg, starshipStill];
 

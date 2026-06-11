@@ -1,3 +1,4 @@
 - [Admin bootstrap pattern](admin-bootstrap.md) — first authed user becomes sole admin; must serialize with a Postgres advisory lock or concurrent first-logins create multiple admins.
 - [drizzle-kit push in CI](drizzle-push-tty.md) — push prompts interactively for destructive DDL (UNIQUE on populated tables) and fails in the non-TTY shell; apply such DDL directly via SQL.
 - [OmniTradeX dual i18n](omnitradex-i18n.md) — marketing translations.ts (5 langs) vs certI18n.ts (7 langs); keep new marketing strings self-contained per-component.
+- [Sourcing real web media](sourcing-real-web-media.md) — prefer wikimedia/nasa public-domain images (rate-limited: spaced retries + Mozilla UA); verify official videos via YouTube oEmbed author_name.
