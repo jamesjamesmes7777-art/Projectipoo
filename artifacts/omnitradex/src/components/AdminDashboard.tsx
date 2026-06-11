@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus, LogOut, Search, FileText, Download, CheckCircle, XCircle,
-  RotateCcw, Trash2, Eye, Clock, ChevronRight, ShieldCheck, AlertTriangle, Filter
+  RotateCcw, Trash2, Eye, Clock, ChevronRight, ShieldCheck, AlertTriangle, Filter,
+  ArrowUpDown, Link2, ExternalLink, X, Loader2,
 } from 'lucide-react';
 import { useAuth } from '@workspace/replit-auth-web';
 import {
@@ -22,20 +23,44 @@ const STATUS_COLOR: Record<ApprovalStatus, string> = {
 };
 
 type View = 'list' | 'preview' | 'audit';
+type SortKey = 'recent' | 'name' | 'shares' | 'value';
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'recent', label: 'Newest first' },
+  { value: 'name', label: 'Name A–Z' },
+  { value: 'shares', label: 'Most shares' },
+  { value: 'value', label: 'Highest value' },
+];
+
+type ToastKind = 'success' | 'error';
+interface AdminToast { id: number; kind: ToastKind; message: string; }
+let toastSeq = 0;
 
 export default function AdminDashboard() {
   const { logout } = useAuth();
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<SortKey>('recent');
   const [view, setView] = useState<View>('list');
   const [selected, setSelected] = useState<Certificate | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<Certificate | undefined>();
   const [qrUrl, setQrUrl] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [toasts, setToasts] = useState<AdminToast[]>([]);
   const certRef = useRef<HTMLDivElement>(null);
+
+  const pushToast = useCallback((kind: ToastKind, message: string) => {
+    const id = ++toastSeq;
+    setToasts(prev => [...prev.slice(-2), { id, kind, message }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  }, []);
+
+  const dismissToast = (id: number) =>
+    setToasts(prev => prev.filter(t => t.id !== id));
 
   async function load() {
     const [c, l] = await Promise.all([getAllCertificates(), getAuditLogs()]);
@@ -43,7 +68,11 @@ export default function AdminDashboard() {
     setLogs(l);
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load()
+      .catch(() => pushToast('error', 'Failed to load certificates'))
+      .finally(() => setLoading(false));
+  }, [pushToast]);
 
   async function handlePreview(cert: Certificate) {
     setSelected(cert);
@@ -53,16 +82,26 @@ export default function AdminDashboard() {
   }
 
   async function handleStatusChange(cert: Certificate, status: ApprovalStatus) {
-    await setApprovalStatus(cert.id, status);
-    await load();
-    if (selected?.id === cert.id) setSelected(s => s ? { ...s, approval_status: status } : s);
+    try {
+      await setApprovalStatus(cert.id, status);
+      await load();
+      if (selected?.id === cert.id) setSelected(s => s ? { ...s, approval_status: status } : s);
+      pushToast('success', `${cert.reference_number} marked ${status}`);
+    } catch (err) {
+      pushToast('error', err instanceof Error ? err.message : 'Status update failed');
+    }
   }
 
   async function handleDelete(cert: Certificate) {
     if (!confirm(`Delete certificate ${cert.reference_number}? This cannot be undone.`)) return;
-    await deleteCertificate(cert.id);
-    await load();
-    if (selected?.id === cert.id) { setSelected(null); setView('list'); }
+    try {
+      await deleteCertificate(cert.id);
+      await load();
+      if (selected?.id === cert.id) { setSelected(null); setView('list'); }
+      pushToast('success', `${cert.reference_number} deleted`);
+    } catch (err) {
+      pushToast('error', err instanceof Error ? err.message : 'Delete failed');
+    }
   }
 
   async function handleExport() {
@@ -70,8 +109,21 @@ export default function AdminDashboard() {
     setExporting(true);
     try {
       await exportCertificatePDF(certRef.current, `cert-${selected.reference_number}.pdf`);
+      pushToast('success', 'PDF exported');
+    } catch {
+      pushToast('error', 'PDF export failed');
     } finally {
       setExporting(false);
+    }
+  }
+
+  async function handleCopyLink(cert: Certificate) {
+    const url = `${window.location.origin}/verify/${cert.reference_number}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      pushToast('success', 'Verification link copied');
+    } catch {
+      pushToast('error', 'Could not copy link');
     }
   }
 
@@ -83,11 +135,21 @@ export default function AdminDashboard() {
     return matchSearch && matchStatus;
   });
 
+  const sorted = [...filtered].sort((a, b) => {
+    switch (sortBy) {
+      case 'name': return a.holder_name.localeCompare(b.holder_name);
+      case 'shares': return b.shares - a.shares;
+      case 'value': return Number(b.total_consideration) - Number(a.total_consideration);
+      case 'recent':
+      default: return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+  });
+
   const stats = {
     total: certs.length,
     approved: certs.filter(c => c.approval_status === 'APPROVED').length,
     pending: certs.filter(c => c.approval_status === 'PENDING').length,
-    draft: certs.filter(c => c.approval_status === 'DRAFT').length,
+    value: certs.reduce((sum, c) => sum + Number(c.total_consideration || 0), 0),
   };
 
   return (
@@ -158,22 +220,22 @@ export default function AdminDashboard() {
                 {view === 'list' && (
                   <div className="flex-shrink-0 px-6 py-4 grid grid-cols-4 gap-3 border-b border-slate-800/40">
                     {[
-                      { label: 'Total', value: stats.total, color: 'text-white' },
-                      { label: 'Approved', value: stats.approved, color: 'text-emerald-400' },
-                      { label: 'Pending', value: stats.pending, color: 'text-amber-400' },
-                      { label: 'Draft', value: stats.draft, color: 'text-slate-400' },
+                      { label: 'Total', value: String(stats.total), color: 'text-white' },
+                      { label: 'Approved', value: String(stats.approved), color: 'text-emerald-400' },
+                      { label: 'Pending', value: String(stats.pending), color: 'text-amber-400' },
+                      { label: 'Value', value: `€${stats.value.toLocaleString()}`, color: 'text-cyan-400' },
                     ].map(s => (
                       <div key={s.label} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/40 text-center">
-                        <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                        <p className={`text-2xl font-black truncate ${s.color}`}>{s.value}</p>
                         <p className="text-slate-600 text-xs font-medium mt-0.5">{s.label}</p>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Search + filter */}
-                <div className="flex-shrink-0 px-4 py-3 flex gap-2 border-b border-slate-800/40">
-                  <div className="relative flex-1">
+                {/* Search + filter + sort */}
+                <div className="flex-shrink-0 px-4 py-3 flex flex-wrap gap-2 border-b border-slate-800/40">
+                  <div className="relative flex-1 min-w-[160px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600" />
                     <input value={search} onChange={e => setSearch(e.target.value)}
                       placeholder="Search name or reference…"
@@ -189,16 +251,30 @@ export default function AdminDashboard() {
                       ))}
                     </select>
                   </div>
+                  <div className="relative">
+                    <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-600" />
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value as SortKey)}
+                      className="pl-7 pr-2 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-sm focus:outline-none focus:border-cyan-500/40 transition-all appearance-none">
+                      {SORT_OPTIONS.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Certificate rows */}
                 <div className="flex-1 overflow-y-auto">
-                  {filtered.length === 0 ? (
+                  {loading ? (
+                    <div className="flex flex-col items-center justify-center h-48 text-slate-600">
+                      <Loader2 className="w-7 h-7 mb-3 animate-spin text-cyan-500/70" />
+                      <p className="text-sm">Loading certificates…</p>
+                    </div>
+                  ) : sorted.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-48 text-slate-600">
                       <FileText className="w-8 h-8 mb-3 opacity-30" />
                       <p className="text-sm">No certificates found</p>
                     </div>
-                  ) : filtered.map(cert => (
+                  ) : sorted.map(cert => (
                     <div
                       key={cert.id}
                       className={`px-4 py-3.5 border-b border-slate-800/40 cursor-pointer hover:bg-slate-800/30 transition-all ${selected?.id === cert.id ? 'bg-slate-800/40' : ''}`}
@@ -254,6 +330,16 @@ export default function AdminDashboard() {
                       <Eye className="w-3.5 h-3.5" />
                       Edit
                     </button>
+                    <button onClick={() => handleCopyLink(selected)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all">
+                      <Link2 className="w-3.5 h-3.5" />
+                      Copy link
+                    </button>
+                    <a href={`/verify/${selected.reference_number}`} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Verify page
+                    </a>
                     <button onClick={handleExport} disabled={exporting}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all disabled:opacity-50">
                       <Download className="w-3.5 h-3.5" />
@@ -285,31 +371,43 @@ export default function AdminDashboard() {
               <h1 className="text-white font-bold text-lg">Audit Log</h1>
             </div>
             <div className="flex-1 overflow-y-auto p-6">
-              {logs.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center h-48 text-slate-600">
+                  <Loader2 className="w-7 h-7 mb-3 animate-spin text-cyan-500/70" />
+                  <p className="text-sm">Loading activity…</p>
+                </div>
+              ) : logs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-slate-600">
                   <Clock className="w-8 h-8 mb-3 opacity-30" />
                   <p className="text-sm">No audit events yet</p>
                 </div>
               ) : (
                 <div className="space-y-2 max-w-3xl">
-                  {logs.map(log => (
-                    <div key={log.id} className="flex items-start gap-4 px-4 py-3 rounded-xl bg-slate-900/50 border border-slate-800/40">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
-                        <ActionIcon action={log.action} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-semibold">{log.action}</span>
-                          {log.certificate_id && (
-                            <span className="text-slate-500 text-xs font-mono truncate">{log.certificate_id.slice(0, 8)}</span>
-                          )}
+                  {logs.map(log => {
+                    const ref = typeof log.metadata?.reference_number === 'string'
+                      ? log.metadata.reference_number
+                      : log.certificate_id
+                        ? log.certificate_id.slice(0, 8)
+                        : null;
+                    return (
+                      <div key={log.id} className="flex items-start gap-4 px-4 py-3 rounded-xl bg-slate-900/50 border border-slate-800/40">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
+                          <ActionIcon action={log.action} />
                         </div>
-                        <p className="text-slate-600 text-xs mt-0.5">
-                          {new Date(log.created_at).toLocaleString()}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-white text-sm font-semibold">{actionLabel(log.action)}</span>
+                            {ref && (
+                              <span className="text-slate-400 text-xs font-mono px-1.5 py-0.5 rounded bg-slate-800/60 border border-slate-700/50">{ref}</span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 text-xs mt-0.5" title={new Date(log.created_at).toLocaleString()}>
+                            {relativeTime(log.created_at)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -317,18 +415,44 @@ export default function AdminDashboard() {
         )}
       </main>
 
+      {/* Action toasts */}
+      <div className="fixed top-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none">
+        {toasts.map(t => (
+          <div key={t.id}
+            className={`pointer-events-auto flex items-start gap-3 px-4 py-3 rounded-xl shadow-2xl shadow-black/40 backdrop-blur-md max-w-xs w-full border ${
+              t.kind === 'success'
+                ? 'bg-emerald-500/10 border-emerald-500/40'
+                : 'bg-red-500/10 border-red-500/40'
+            }`}>
+            {t.kind === 'success'
+              ? <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              : <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />}
+            <p className={`flex-1 text-sm font-medium ${t.kind === 'success' ? 'text-emerald-100' : 'text-red-100'}`}>{t.message}</p>
+            <button onClick={() => dismissToast(t.id)} aria-label="Dismiss notification" className="text-slate-400 hover:text-white flex-shrink-0 transition-colors mt-0.5">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+
       {/* Certificate Form Modal */}
       {showForm && (
         <CertificateForm
           initial={editTarget}
           onSave={async data => {
-            if (editTarget?.id) {
-              await updateCertificate(editTarget.id, data);
+            const editing = !!editTarget?.id;
+            if (editing) {
+              await updateCertificate(editTarget!.id, data);
             } else {
               await createCertificate(data);
             }
             setShowForm(false);
-            await load();
+            try {
+              await load();
+              pushToast('success', `${data.reference_number} ${editing ? 'updated' : 'created'}`);
+            } catch {
+              pushToast('error', `Saved, but failed to refresh the list`);
+            }
           }}
           onCancel={() => setShowForm(false)}
         />
@@ -362,4 +486,31 @@ function ActionIcon({ action }: { action: string }) {
   if (action === 'DELETED')  return <Trash2 className="w-4 h-4 text-red-400" />;
   if (action === 'PENDING')  return <AlertTriangle className="w-4 h-4 text-amber-400" />;
   return <FileText className="w-4 h-4 text-slate-400" />;
+}
+
+function actionLabel(action: string): string {
+  const map: Record<string, string> = {
+    CREATED: 'Certificate created',
+    UPDATED: 'Certificate updated',
+    DELETED: 'Certificate deleted',
+    APPROVED: 'Certificate approved',
+    REJECTED: 'Certificate rejected',
+    REVOKED: 'Certificate revoked',
+    PENDING: 'Submitted for approval',
+  };
+  return map[action] ?? action;
+}
+
+function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  const sec = Math.round(diff / 1000);
+  if (sec < 60) return 'just now';
+  const min = Math.round(sec / 60);
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.round(hr / 24);
+  if (day < 7) return `${day}d ago`;
+  return new Date(iso).toLocaleDateString();
 }

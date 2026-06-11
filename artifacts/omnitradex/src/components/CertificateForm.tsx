@@ -56,6 +56,12 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
     }
   }, [form.reference_number, form.certificate_number]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancel(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -70,9 +76,11 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
     }
   }
 
-  const F = ({ label, name, type = 'text', required }: { label: string; name: keyof typeof form; type?: string; required?: boolean }) => (
+  const F = ({ label, name, type = 'text', required, hint }: { label: string; name: keyof typeof form; type?: string; required?: boolean; hint?: string }) => (
     <div>
-      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">{label}</label>
+      <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
+        {label}{required && <span className="text-cyan-400 ml-0.5">*</span>}
+      </label>
       <input
         type={type}
         value={String(form[name] ?? '')}
@@ -81,6 +89,7 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
         step={type === 'number' ? 'any' : undefined}
         className="w-full px-3 py-2.5 rounded-lg bg-slate-900 border border-slate-700/60 text-white text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
       />
+      {hint && <p className="text-[10px] text-slate-600 mt-1">{hint}</p>}
     </div>
   );
 
@@ -89,7 +98,7 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
       <div className="w-full max-w-2xl rounded-2xl border border-slate-700/50 bg-slate-950 shadow-2xl">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800">
           <h2 className="text-white font-bold text-lg">{initial?.id ? 'Edit Certificate' : 'New Certificate'}</h2>
-          <button onClick={onCancel} className="text-slate-500 hover:text-white transition-colors">
+          <button onClick={onCancel} aria-label="Close" className="text-slate-500 hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -104,7 +113,7 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
             <F label="Security Code" name="security_code" required />
             <F label="Shares" name="shares" type="number" required />
             <F label="Allocation Price (€)" name="allocation_price" type="number" required />
-            <F label="Total Consideration (€)" name="total_consideration" type="number" required />
+            <F label="Total Consideration (€)" name="total_consideration" type="number" required hint="Auto-calculated from shares × price" />
             <F label="Issue Date" name="issue_date" type="date" required />
             <F label="Account Manager" name="account_manager" />
             <div>
