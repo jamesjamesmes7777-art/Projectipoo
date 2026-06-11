@@ -342,22 +342,9 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               </div>
             </div>
 
-            {/* Center authentication emblem */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9 }}>
-              <div style={{
-                position: 'relative', width: 88, height: 88,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: '50%',
-                border: '1.5px solid rgba(50,230,255,0.45)',
-                background: 'rgba(8,20,44,0.5)',
-                boxShadow: 'inset 0 0 0 4px rgba(8,20,44,0.55), 0 0 20px rgba(34,211,238,0.12)',
-              }}>
-                <div style={{ position: 'absolute', inset: 6, borderRadius: '50%', border: '1px dashed rgba(50,230,255,0.28)' }} />
-                <CheckCircle2 size={32} color="rgba(50,230,255,0.9)" strokeWidth={1.6} />
-              </div>
-              <p style={{ color: 'rgba(50,230,255,0.7)', fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.24em', textAlign: 'center' }}>
-                {t.authenticated}
-              </p>
+            {/* Center stock-candles motif */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'stretch', overflow: 'hidden', opacity: 0.5 }}>
+              <CandleChart />
             </div>
 
             {/* Seal */}
@@ -430,6 +417,47 @@ function CornerBox({ children, pad }: { children: ReactNode; pad: number | strin
       <span style={corner({ bottom: -5, left: -5, borderBottom: `${W}px solid ${col}`, borderLeft: `${W}px solid ${col}` })} />
       <span style={corner({ bottom: -5, right: -5, borderBottom: `${W}px solid ${col}`, borderRight: `${W}px solid ${col}` })} />
     </div>
+  );
+}
+
+// ── Stock candlestick motif ─────────────────────────────────────────────────────
+
+function CandleChart() {
+  const W = 250, H = 92;
+  // [openY, closeY, highY, lowY] as fractions of H (0 = top). Up-trending series.
+  const data: [number, number, number, number][] = [
+    [0.58, 0.46, 0.40, 0.66],
+    [0.46, 0.52, 0.40, 0.60],
+    [0.52, 0.36, 0.30, 0.58],
+    [0.36, 0.44, 0.30, 0.52],
+    [0.44, 0.30, 0.24, 0.50],
+    [0.30, 0.40, 0.26, 0.48],
+    [0.40, 0.24, 0.18, 0.46],
+    [0.24, 0.34, 0.20, 0.42],
+    [0.34, 0.20, 0.14, 0.40],
+    [0.20, 0.30, 0.16, 0.36],
+    [0.30, 0.16, 0.10, 0.34],
+    [0.16, 0.24, 0.12, 0.30],
+  ];
+  const n = data.length;
+  const slot = W / n;
+  const bodyW = slot * 0.46;
+  return (
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      {data.map(([o, c, h, l], i) => {
+        const cx = i * slot + slot / 2;
+        const up = c < o;
+        const color = up ? 'rgba(87,212,106,0.9)' : 'rgba(255,99,99,0.85)';
+        const top = Math.min(o, c) * H;
+        const bot = Math.max(o, c) * H;
+        return (
+          <g key={i} stroke={color} fill={color}>
+            <line x1={cx} x2={cx} y1={h * H} y2={l * H} strokeWidth={1} />
+            <rect x={cx - bodyW / 2} y={top} width={bodyW} height={Math.max(2, bot - top)} />
+          </g>
+        );
+      })}
+    </svg>
   );
 }
 
