@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Users, TrendingUp, Package } from 'lucide-react';
 import { useLang } from '../context/LangContext';
-import { useInventoryTicker } from '../hooks/useInventoryTicker';
+import { useInventory } from '../context/InventoryContext';
 import { useCountUp } from '../hooks/useCountUp';
 
 function AnimatedCard({
@@ -111,7 +111,7 @@ function StaticCard({
 
 export default function Inventory() {
   const { t, fmtNum } = useLang();
-  const { total, allocated, available, investors, pct } = useInventoryTicker();
+  const { total, allocated, available, investors, pct } = useInventory();
 
   const allocatedPct = pct.toFixed(2);
   const availablePct = (100 - pct).toFixed(2);

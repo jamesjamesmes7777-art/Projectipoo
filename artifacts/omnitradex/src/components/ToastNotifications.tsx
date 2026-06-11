@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useLang } from '../context/LangContext';
+import { useInventory } from '../context/InventoryContext';
 
 const NOTIFICATIONS = [
   { name: 'Sebastian N.', city: 'Valencia, ES', shares: 1175 },
@@ -29,6 +30,7 @@ let toastCounter = 0;
 export default function ToastNotifications() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const { t } = useLang();
+  const { addAllocation } = useInventory();
 
   const dismiss = useCallback((id: number) => {
     setToasts((prev) => prev.filter((item) => item.id !== id));
@@ -42,6 +44,7 @@ export default function ToastNotifications() {
       index++;
       const id = ++toastCounter;
       setToasts((prev) => [...prev.slice(-2), { id, ...n }]);
+      addAllocation(n.shares);
       setTimeout(() => dismiss(id), 5000);
     };
 
