@@ -38,6 +38,7 @@ interface CertStrings {
   nameLabel: string;
   titleLabel: string;
   dateLabel: string;
+  officialSeal: string;
   // Security sub-label
   securitySub: string;
   // Date locale
@@ -71,6 +72,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Name:',
     titleLabel: 'Title:',
     dateLabel: 'Date:',
+    officialSeal: 'Official Seal',
     securitySub: 'Pre-IPO Ordinary Shares',
     dateLocale: 'en-GB',
   },
@@ -101,6 +103,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Όνομα:',
     titleLabel: 'Τίτλος:',
     dateLabel: 'Ημ/νία:',
+    officialSeal: 'Επίσημη Σφραγίδα',
     securitySub: 'Pre-IPO Κοινές Μετοχές',
     dateLocale: 'el-GR',
   },
@@ -131,6 +134,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Nom :',
     titleLabel: 'Titre :',
     dateLabel: 'Date :',
+    officialSeal: 'Sceau Officiel',
     securitySub: 'Actions Ordinaires Pre-IPO',
     dateLocale: 'fr-FR',
   },
@@ -161,6 +165,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Name:',
     titleLabel: 'Titel:',
     dateLabel: 'Datum:',
+    officialSeal: 'Offizielles Siegel',
     securitySub: 'Pre-IPO Stammaktien',
     dateLocale: 'de-DE',
   },
@@ -191,6 +196,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Nombre:',
     titleLabel: 'Cargo:',
     dateLabel: 'Fecha:',
+    officialSeal: 'Sello Oficial',
     securitySub: 'Acciones Ordinarias Pre-IPO',
     dateLocale: 'es-ES',
   },
@@ -221,6 +227,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: 'Nome:',
     titleLabel: 'Titolo:',
     dateLabel: 'Data:',
+    officialSeal: 'Sigillo Ufficiale',
     securitySub: 'Azioni Ordinarie Pre-IPO',
     dateLocale: 'it-IT',
   },
@@ -251,6 +258,7 @@ export const CERT_I18N: Record<CertLang, CertStrings> = {
     nameLabel: ':الاسم',
     titleLabel: ':المسمى',
     dateLabel: ':التاريخ',
+    officialSeal: 'الختم الرسمي',
     securitySub: 'أسهم عادية قبل الطرح العام',
     dateLocale: 'ar-SA',
   },

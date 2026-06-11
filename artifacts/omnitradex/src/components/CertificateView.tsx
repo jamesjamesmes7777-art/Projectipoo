@@ -302,16 +302,28 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
         {/* ════ SIGNATURE BAND ════ */}
         <div style={{
           flexShrink: 0,
-          background: '#061326',
+          background: 'linear-gradient(180deg, #061326 0%, #040E1F 100%)',
           borderTop: '1px solid rgba(34,211,238,0.2)',
-          padding: '18px 30px',
+          padding: '16px 34px 20px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
+          {/* Ornamental divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
+            <svg width="40" height="12" viewBox="0 0 40 12">
+              <polygon points="20,1 23,5 20,9 17,5" fill="none" stroke="rgba(50,230,255,0.55)" strokeWidth="0.8" />
+              <line x1="0" y1="6" x2="14" y2="6" stroke="rgba(50,230,255,0.3)" strokeWidth="0.7" />
+              <line x1="26" y1="6" x2="40" y2="6" stroke="rgba(50,230,255,0.3)" strokeWidth="0.7" />
+            </svg>
+            <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
             <div style={{ textAlign: t.rtl ? 'right' : 'left' }}>
               <div style={{
-                display: 'inline-block', background: '#fff', padding: 6,
-                border: '1px solid rgba(50,230,255,0.25)', marginBottom: 9,
+                display: 'inline-block', background: '#fff', padding: '8px 14px',
+                border: '1px solid rgba(50,230,255,0.3)',
+                boxShadow: '0 6px 22px rgba(0,0,0,0.4)', marginBottom: 11,
               }}>
                 <img
                   src={signatureImg}
@@ -320,28 +332,37 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 />
               </div>
               <p style={{
-                color: '#ffffff', fontSize: 8.5, fontWeight: 800,
-                textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: 5,
+                color: 'rgba(50,230,255,0.9)', fontSize: 8.5, fontWeight: 800,
+                textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 7,
               }}>
                 {t.authorisedSig}
               </p>
-              <div style={{ color: '#ffffff', fontSize: 9.5, lineHeight: 1.65 }}>
-                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.nameLabel}</span> Mr. Simon Mark Hickman</p>
-                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
-                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.dateLabel}</span> {issueDate}</p>
+              <div style={{ color: '#ffffff', fontSize: 9.5, lineHeight: 1.75 }}>
+                <p><span style={{ color: 'rgba(255,255,255,0.55)', display: 'inline-block', minWidth: 36, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.nameLabel}</span> Mr. Simon Mark Hickman</p>
+                <p><span style={{ color: 'rgba(255,255,255,0.55)', display: 'inline-block', minWidth: 36, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
+                <p><span style={{ color: 'rgba(255,255,255,0.55)', display: 'inline-block', minWidth: 36, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.dateLabel}</span> {issueDate}</p>
               </div>
             </div>
 
             {/* Seal */}
-            <div style={{
-              background: '#fff', padding: 6,
-              border: '1px solid rgba(50,230,255,0.25)', display: 'flex',
-            }}>
-              <img
-                src={sealImg}
-                alt="Official Seal"
-                style={{ width: 140, height: 140, objectFit: 'contain', display: 'block' }}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{
+                background: '#fff', padding: 8,
+                border: '1px solid rgba(50,230,255,0.3)',
+                boxShadow: '0 6px 22px rgba(0,0,0,0.4)', display: 'flex',
+              }}>
+                <img
+                  src={sealImg}
+                  alt="Official Seal"
+                  style={{ width: 124, height: 124, objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+              <p style={{
+                color: 'rgba(50,230,255,0.7)', fontSize: 8, fontWeight: 700,
+                textTransform: 'uppercase', letterSpacing: '0.24em',
+              }}>
+                {t.officialSeal}
+              </p>
             </div>
           </div>
         </div>
