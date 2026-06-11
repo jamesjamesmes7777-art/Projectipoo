@@ -302,38 +302,45 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
         {/* ════ SIGNATURE BAND ════ */}
         <div style={{
           flexShrink: 0,
-          background: 'linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%)',
-          borderTop: '3px solid #1B3A6B',
+          background: '#061326',
+          borderTop: '1px solid rgba(34,211,238,0.2)',
           padding: '18px 30px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
             <div style={{ textAlign: t.rtl ? 'right' : 'left' }}>
-              <img
-                src={signatureImg}
-                alt="Signature"
-                style={{ width: 220, height: 'auto', objectFit: 'contain', marginBottom: 2, display: 'block' }}
-              />
-              <div style={{ borderBottom: '1.5px solid #2d4a7a', width: 220, marginBottom: 5, marginTop: 2 }} />
+              <div style={{
+                display: 'inline-block', background: '#fff', padding: 6,
+                border: '1px solid rgba(50,230,255,0.25)', marginBottom: 9,
+              }}>
+                <img
+                  src={signatureImg}
+                  alt="Signature"
+                  style={{ width: 200, height: 'auto', objectFit: 'contain', display: 'block' }}
+                />
+              </div>
               <p style={{
-                color: '#0f172a', fontSize: 8.5, fontWeight: 800,
+                color: '#ffffff', fontSize: 8.5, fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: 5,
               }}>
                 {t.authorisedSig}
               </p>
-              <div style={{ color: '#334155', fontSize: 9.5, lineHeight: 1.65 }}>
-                <p><span style={{ color: '#6b7a9e', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.nameLabel}</span> Mr. Simon Mark Hickman</p>
-                <p><span style={{ color: '#6b7a9e', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
-                <p><span style={{ color: '#6b7a9e', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.dateLabel}</span> {issueDate}</p>
+              <div style={{ color: '#ffffff', fontSize: 9.5, lineHeight: 1.65 }}>
+                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.nameLabel}</span> Mr. Simon Mark Hickman</p>
+                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
+                <p><span style={{ color: 'rgba(255,255,255,0.6)', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.dateLabel}</span> {issueDate}</p>
               </div>
             </div>
 
             {/* Seal */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{
+              background: '#fff', padding: 6,
+              border: '1px solid rgba(50,230,255,0.25)', display: 'flex',
+            }}>
               <img
                 src={sealImg}
                 alt="Official Seal"
-                style={{ width: 150, height: 150, objectFit: 'contain' }}
+                style={{ width: 140, height: 140, objectFit: 'contain', display: 'block' }}
               />
             </div>
           </div>
