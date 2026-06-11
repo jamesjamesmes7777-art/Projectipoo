@@ -317,12 +317,13 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
             <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
-            <div style={{ textAlign: t.rtl ? 'right' : 'left' }}>
+            <div style={{ textAlign: t.rtl ? 'right' : 'left', flexShrink: 0 }}>
               <div style={{
                 display: 'inline-block', background: '#fff', padding: '8px 14px',
                 border: '1px solid rgba(50,230,255,0.3)',
+                outline: '1px solid rgba(50,230,255,0.16)', outlineOffset: 3,
                 boxShadow: '0 6px 22px rgba(0,0,0,0.4)', marginBottom: 11,
               }}>
                 <img
@@ -344,11 +345,30 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               </div>
             </div>
 
+            {/* Center authentication emblem */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9 }}>
+              <div style={{
+                position: 'relative', width: 88, height: 88,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%',
+                border: '1.5px solid rgba(50,230,255,0.45)',
+                background: 'rgba(8,20,44,0.5)',
+                boxShadow: 'inset 0 0 0 4px rgba(8,20,44,0.55), 0 0 20px rgba(34,211,238,0.12)',
+              }}>
+                <div style={{ position: 'absolute', inset: 6, borderRadius: '50%', border: '1px dashed rgba(50,230,255,0.28)' }} />
+                <CheckCircle2 size={32} color="rgba(50,230,255,0.9)" strokeWidth={1.6} />
+              </div>
+              <p style={{ color: 'rgba(50,230,255,0.7)', fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.24em', textAlign: 'center' }}>
+                {t.authenticated}
+              </p>
+            </div>
+
             {/* Seal */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <div style={{
                 background: '#fff', padding: 8,
                 border: '1px solid rgba(50,230,255,0.3)',
+                outline: '1px solid rgba(50,230,255,0.16)', outlineOffset: 3,
                 boxShadow: '0 6px 22px rgba(0,0,0,0.4)', display: 'flex',
               }}>
                 <img
