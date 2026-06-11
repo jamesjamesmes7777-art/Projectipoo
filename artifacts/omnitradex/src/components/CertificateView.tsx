@@ -153,9 +153,9 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
             {/* Holder name */}
             <p style={{
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontWeight: 600,
-              fontSize: 56, color: '#ffffff', lineHeight: 1.05, marginBottom: 10,
+              fontFamily: "'BillyMoney', 'Cormorant Garamond', Georgia, serif",
+              fontWeight: 400,
+              fontSize: 52, color: '#ffffff', lineHeight: 1.1, marginBottom: 10,
               letterSpacing: '0.01em',
               textShadow: '0 2px 20px rgba(255,255,255,0.08)',
             }}>
@@ -211,6 +211,14 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
             {/* SHARES HELD */}
             <div>
+              <div style={{ marginBottom: 12 }}>
+                <p style={{ color: 'rgba(183,196,214,0.45)', fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 2 }}>
+                  {t.certNo}
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em', direction: 'ltr' }}>
+                  {cert.certificate_number}
+                </p>
+              </div>
               <p style={{
                 color: 'rgba(255,255,255,0.92)', fontSize: 11, fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: 0,

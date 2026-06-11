@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'BillyMoney';
+  src: url('./assets/BillyMoney-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Modal spinner — outside layer to avoid purge */
 @keyframes spin {
   to { transform: rotate(360deg); }
