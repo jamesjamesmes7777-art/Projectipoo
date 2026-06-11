@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, type ReactNode, type CSSProperties } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import type { Certificate } from '../lib/types';
 import { getCertStrings, fmtDate } from '../lib/certI18n';
@@ -320,17 +320,14 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
             <div style={{ textAlign: t.rtl ? 'right' : 'left', flexShrink: 0 }}>
-              <div style={{
-                display: 'inline-block', background: '#fff', padding: '8px 14px',
-                border: '1px solid rgba(50,230,255,0.3)',
-                outline: '1px solid rgba(50,230,255,0.16)', outlineOffset: 3,
-                boxShadow: '0 6px 22px rgba(0,0,0,0.4)', marginBottom: 11,
-              }}>
-                <img
-                  src={signatureImg}
-                  alt="Signature"
-                  style={{ width: 200, height: 'auto', objectFit: 'contain', display: 'block' }}
-                />
+              <div style={{ display: 'inline-block', marginBottom: 14 }}>
+                <CornerBox pad="9px 15px">
+                  <img
+                    src={signatureImg}
+                    alt="Signature"
+                    style={{ width: 200, height: 'auto', objectFit: 'contain', display: 'block' }}
+                  />
+                </CornerBox>
               </div>
               <p style={{
                 color: 'rgba(50,230,255,0.9)', fontSize: 8.5, fontWeight: 800,
@@ -365,18 +362,13 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
             {/* Seal */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <div style={{
-                background: '#fff', padding: 8,
-                border: '1px solid rgba(50,230,255,0.3)',
-                outline: '1px solid rgba(50,230,255,0.16)', outlineOffset: 3,
-                boxShadow: '0 6px 22px rgba(0,0,0,0.4)', display: 'flex',
-              }}>
+              <CornerBox pad={9}>
                 <img
                   src={sealImg}
                   alt="Official Seal"
                   style={{ width: 124, height: 124, objectFit: 'contain', display: 'block' }}
                 />
-              </div>
+              </CornerBox>
               <p style={{
                 color: 'rgba(50,230,255,0.7)', fontSize: 8, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.24em',
@@ -411,6 +403,35 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
 CertificateView.displayName = 'CertificateView';
 export default CertificateView;
+
+// ── Framed box with corner brackets ────────────────────────────────────────────
+
+function CornerBox({ children, pad }: { children: ReactNode; pad: number | string }) {
+  const C = 11;
+  const W = 1.5;
+  const col = 'rgba(50,230,255,0.85)';
+  const corner = (extra: CSSProperties): CSSProperties => ({
+    position: 'absolute', width: C, height: C, pointerEvents: 'none', ...extra,
+  });
+  return (
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <div style={{
+        background: '#fff', padding: pad, display: 'flex',
+        border: '1px solid rgba(50,230,255,0.35)',
+        boxShadow: '0 6px 22px rgba(0,0,0,0.4)',
+      }}>
+        {children}
+      </div>
+      {/* thin inset outer frame */}
+      <div style={{ position: 'absolute', inset: -5, border: '1px solid rgba(50,230,255,0.2)', pointerEvents: 'none' }} />
+      {/* corner brackets */}
+      <span style={corner({ top: -5, left: -5, borderTop: `${W}px solid ${col}`, borderLeft: `${W}px solid ${col}` })} />
+      <span style={corner({ top: -5, right: -5, borderTop: `${W}px solid ${col}`, borderRight: `${W}px solid ${col}` })} />
+      <span style={corner({ bottom: -5, left: -5, borderBottom: `${W}px solid ${col}`, borderLeft: `${W}px solid ${col}` })} />
+      <span style={corner({ bottom: -5, right: -5, borderBottom: `${W}px solid ${col}`, borderRight: `${W}px solid ${col}` })} />
+    </div>
+  );
+}
 
 // ── Grid row ──────────────────────────────────────────────────────────────────
 
