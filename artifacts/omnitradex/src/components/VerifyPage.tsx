@@ -164,8 +164,15 @@ export default function VerifyPage() {
 
             {/* Certificate — scaled to fit screen */}
             <div className="flex justify-center">
-              <div style={{ transform: 'scale(0.75)', transformOrigin: 'top center', width: 793, marginBottom: -280 }}>
-                <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language={selectedLang} />
+              <div style={{
+                width: Math.round(793 * 0.75),
+                height: Math.round(1122 * 0.75),
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}>
+                <div style={{ transform: 'scale(0.75)', transformOrigin: 'top left', width: 793 }}>
+                  <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language={selectedLang} />
+                </div>
               </div>
             </div>
           </div>
