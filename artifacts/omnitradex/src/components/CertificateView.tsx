@@ -143,7 +143,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
         <div style={{ flex: 1, display: 'flex', gap: 20, padding: '22px 28px 16px', minHeight: 0, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
 
           {/* ── LEFT COLUMN ── */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', textAlign: t.rtl ? 'right' : 'left' }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', textAlign: t.rtl ? 'right' : 'left' }}>
 
             <div>
             {/* Certify intro */}
@@ -153,9 +153,10 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
             {/* Holder name */}
             <p style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontStyle: 'italic', fontWeight: 600,
-              fontSize: 46, color: '#ffffff', lineHeight: 1.15, marginBottom: 10,
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontWeight: 600,
+              fontSize: 56, color: '#ffffff', lineHeight: 1.05, marginBottom: 10,
+              letterSpacing: '0.01em',
               textShadow: '0 2px 20px rgba(255,255,255,0.08)',
             }}>
               {cert.holder_name}
@@ -168,13 +169,13 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
             </div>
 
             {/* Body text */}
-            <p style={{ color: 'rgba(255,255,255,0.68)', fontSize: 12.5, lineHeight: 1.75, maxWidth: 315 }}>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13.5, lineHeight: 2.0, maxWidth: 330 }}>
               {t.holderBody(cert.holder_name, cert.shares, cert.security_name, cert.security_code)}
             </p>
 
             {/* Key stats mini-strip */}
             <div style={{
-              marginTop: 16,
+              marginTop: 22,
               display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
               border: '1px solid rgba(50,230,255,0.2)',
               background: 'rgba(10,24,48,0.5)',
@@ -185,20 +186,20 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 { label: issueDate.replace(/(\d+)\s(\w+)\s(\d{4})/, '$2 $3'), sub: t.dateOfIssue },
               ].map((s, i) => (
                 <div key={i} style={{
-                  padding: '8px 10px', textAlign: 'center',
+                  padding: '13px 10px', textAlign: 'center',
                   borderRight: i < 2 ? '1px solid rgba(50,230,255,0.15)' : undefined,
                 }}>
-                  <p style={{ color: 'rgba(50,230,255,0.9)', fontSize: 11.5, fontWeight: 800, letterSpacing: '0.04em' }}>{s.label}</p>
-                  <p style={{ color: 'rgba(183,196,214,0.5)', fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>{s.sub}</p>
+                  <p style={{ color: 'rgba(50,230,255,0.9)', fontSize: 12.5, fontWeight: 800, letterSpacing: '0.04em' }}>{s.label}</p>
+                  <p style={{ color: 'rgba(183,196,214,0.5)', fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 3 }}>{s.sub}</p>
                 </div>
               ))}
             </div>
 
             </div>
 
-            <div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             {/* Ornamental divider */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 16px' }}>
               <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
               <svg width="40" height="12" viewBox="0 0 40 12">
                 <polygon points="20,1 23,5 20,9 17,5" fill="none" stroke="rgba(50,230,255,0.55)" strokeWidth="0.8" />
@@ -221,8 +222,8 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 {t.sharesHeld}
               </p>
               <p style={{
-                fontSize: 148, fontWeight: 900, fontStyle: 'italic',
-                lineHeight: 0.88, color: 'rgba(50,230,255,1)',
+                fontSize: 168, fontWeight: 900, fontStyle: 'italic',
+                lineHeight: 0.9, color: 'rgba(50,230,255,1)',
                 textShadow: '0 0 50px rgba(50,230,255,0.7), 0 0 100px rgba(50,230,255,0.32)',
                 letterSpacing: '-6px', margin: 0,
               }}>
@@ -233,11 +234,10 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           </div>
 
           {/* ── RIGHT COLUMN ── */}
-          <div style={{ flexShrink: 0, width: 316, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 7 }}>
+          <div style={{ flexShrink: 0, width: 316, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             {/* Data grid */}
-            <div style={{ border: '1px solid rgba(50,230,255,0.35)', background: 'rgba(8,20,44,0.65)' }}>
+            <div style={{ border: '1px solid rgba(50,230,255,0.35)', background: 'rgba(8,20,44,0.65)', flex: 1, display: 'flex', flexDirection: 'column' }}>
               <GridRow label={t.registeredHolder} value={cert.holder_name} br rtl={t.rtl} />
               <GridRow label={t.allocationRef} value={cert.reference_number} cyan divider rtl={t.rtl} />
               <GridRow label={t.registeredAddress} value={cert.registered_address ?? '—'} br divider rtl={t.rtl} />
@@ -282,7 +282,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                     {cert.integrity_hash}
                   </p>
                   <p style={{ color: 'rgba(183,196,214,0.42)', fontSize: 8.5, lineHeight: 1.6 }}>
-                    {t.authBody(cert.account_manager)}
+                    {t.authBody(null)}
                   </p>
                 </div>
                 {qrDataUrl && (
@@ -292,25 +292,6 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 )}
               </div>
             </div>
-            </div>
-
-            {/* Account manager strip */}
-            {cert.account_manager && (
-              <div style={{
-                border: '1px solid rgba(50,230,255,0.18)',
-                background: 'rgba(8,20,44,0.45)',
-                padding: '7px 12px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                flexDirection: t.rtl ? 'row-reverse' : 'row',
-              }}>
-                <p style={{ color: 'rgba(183,196,214,0.4)', fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                  Account Manager
-                </p>
-                <p style={{ color: 'rgba(50,230,255,0.85)', fontSize: 10, fontWeight: 600 }}>
-                  {cert.account_manager}
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -393,20 +374,21 @@ function GridRow({ label, value, br, cyan, green, divider, rtl }: {
 }) {
   return (
     <div style={{
-      display: 'grid', gridTemplateColumns: '1fr 1fr',
+      flex: 1,
+      display: 'grid', gridTemplateColumns: '1fr 1fr', alignItems: 'center',
       borderBottom: divider ? '1px solid rgba(50,230,255,0.18)' : undefined,
       direction: rtl ? 'rtl' : 'ltr',
     }}>
       <div style={{
         borderRight: !rtl && br ? '1px solid rgba(50,230,255,0.18)' : undefined,
         borderLeft: rtl && br ? '1px solid rgba(50,230,255,0.18)' : undefined,
-        padding: '10px 10px',
+        padding: '13px 10px', height: '100%', display: 'flex', alignItems: 'center',
       }}>
         <p style={{ color: 'rgba(183,196,214,0.45)', fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
           {label}
         </p>
       </div>
-      <div style={{ padding: '10px 10px' }}>
+      <div style={{ padding: '13px 10px', height: '100%', display: 'flex', alignItems: 'center' }}>
         <p style={{
           fontSize: 11.5, fontWeight: 700, lineHeight: 1.35, whiteSpace: 'pre-line',
           color: cyan ? 'rgba(50,230,255,1)' : green ? 'rgba(87,212,106,1)' : '#ffffff',
