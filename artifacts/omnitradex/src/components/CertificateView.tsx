@@ -317,7 +317,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
             <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 18, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
             <div style={{ textAlign: t.rtl ? 'right' : 'left', flexShrink: 0 }}>
               <div style={{ display: 'inline-block', marginBottom: 14 }}>
@@ -325,7 +325,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                   <img
                     src={signatureImg}
                     alt="Signature"
-                    style={{ width: 200, height: 'auto', objectFit: 'contain', display: 'block' }}
+                    style={{ height: 132, width: 'auto', objectFit: 'contain', display: 'block' }}
                   />
                 </CornerBox>
               </div>
@@ -342,8 +342,8 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               </div>
             </div>
 
-            {/* Center stock-candles motif */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'stretch', overflow: 'hidden', opacity: 0.5 }}>
+            {/* Center investment-growth motif */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'center', overflow: 'hidden', opacity: 0.92 }}>
               <CandleChart />
             </div>
 
@@ -353,7 +353,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 <img
                   src={sealImg}
                   alt="Official Seal"
-                  style={{ width: 124, height: 124, objectFit: 'contain', display: 'block' }}
+                  style={{ width: 132, height: 132, objectFit: 'contain', display: 'block' }}
                 />
               </CornerBox>
               <p style={{
@@ -423,40 +423,79 @@ function CornerBox({ children, pad }: { children: ReactNode; pad: number | strin
 // ── Stock candlestick motif ─────────────────────────────────────────────────────
 
 function CandleChart() {
-  const W = 250, H = 92;
-  // [openY, closeY, highY, lowY] as fractions of H (0 = top). Up-trending series.
+  const W = 270, H = 116;
+  const padX = 6, padTop = 18, padBot = 12;
+  const innerH = H - padTop - padBot;
+  // [openY, closeY, highY, lowY] as fractions (0 = top). Up-trending series.
   const data: [number, number, number, number][] = [
-    [0.58, 0.46, 0.40, 0.66],
-    [0.46, 0.52, 0.40, 0.60],
-    [0.52, 0.36, 0.30, 0.58],
-    [0.36, 0.44, 0.30, 0.52],
-    [0.44, 0.30, 0.24, 0.50],
+    [0.62, 0.52, 0.46, 0.72],
+    [0.52, 0.58, 0.48, 0.66],
+    [0.58, 0.42, 0.36, 0.64],
+    [0.42, 0.50, 0.36, 0.58],
+    [0.50, 0.36, 0.30, 0.56],
+    [0.36, 0.46, 0.32, 0.54],
+    [0.46, 0.30, 0.24, 0.52],
     [0.30, 0.40, 0.26, 0.48],
     [0.40, 0.24, 0.18, 0.46],
     [0.24, 0.34, 0.20, 0.42],
-    [0.34, 0.20, 0.14, 0.40],
-    [0.20, 0.30, 0.16, 0.36],
-    [0.30, 0.16, 0.10, 0.34],
-    [0.16, 0.24, 0.12, 0.30],
+    [0.34, 0.18, 0.12, 0.40],
+    [0.18, 0.09, 0.05, 0.32],
   ];
   const n = data.length;
-  const slot = W / n;
-  const bodyW = slot * 0.46;
+  const slot = (W - padX * 2) / n;
+  const bodyW = slot * 0.42;
+  const x = (i: number) => padX + i * slot + slot / 2;
+  const y = (f: number) => padTop + f * innerH;
+
+  const closePts = data.map((d, i) => [x(i), y(d[1])] as const);
+  const linePath = closePts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0]},${p[1]}`).join(' ');
+  const areaPath = `${linePath} L${closePts[n - 1][0]},${H - padBot} L${closePts[0][0]},${H - padBot} Z`;
+  const last = closePts[n - 1];
+
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      <defs>
+        <linearGradient id="otx-growth-area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(50,230,255,0.30)" />
+          <stop offset="100%" stopColor="rgba(50,230,255,0)" />
+        </linearGradient>
+      </defs>
+
+      {/* baseline grid */}
+      {[0.26, 0.5, 0.74].map((g, i) => (
+        <line key={`g${i}`} x1={padX} x2={W - padX} y1={padTop + g * innerH} y2={padTop + g * innerH}
+          stroke="rgba(120,160,200,0.10)" strokeWidth={0.6} strokeDasharray="2 3" />
+      ))}
+
+      {/* candles */}
       {data.map(([o, c, h, l], i) => {
-        const cx = i * slot + slot / 2;
+        const cx = x(i);
         const up = c < o;
-        const color = up ? 'rgba(87,212,106,0.9)' : 'rgba(255,99,99,0.85)';
-        const top = Math.min(o, c) * H;
-        const bot = Math.max(o, c) * H;
+        const color = up ? 'rgba(87,212,106,0.95)' : 'rgba(255,99,99,0.9)';
+        const top = y(Math.min(o, c));
+        const bot = y(Math.max(o, c));
         return (
           <g key={i} stroke={color} fill={color}>
-            <line x1={cx} x2={cx} y1={h * H} y2={l * H} strokeWidth={1} />
-            <rect x={cx - bodyW / 2} y={top} width={bodyW} height={Math.max(2, bot - top)} />
+            <line x1={cx} x2={cx} y1={y(h)} y2={y(l)} strokeWidth={1} />
+            <rect x={cx - bodyW / 2} y={top} width={bodyW} height={Math.max(1.6, bot - top)} rx={0.6} />
           </g>
         );
       })}
+
+      {/* gradient area + trend line (layered for a soft glow) */}
+      <path d={areaPath} fill="url(#otx-growth-area)" stroke="none" />
+      <path d={linePath} fill="none" stroke="rgba(50,230,255,0.18)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="rgba(125,240,255,0.95)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* end marker */}
+      <circle cx={last[0]} cy={last[1]} r={3} fill="#08182c" stroke="rgba(125,240,255,1)" strokeWidth={1.4} />
+
+      {/* upward gain badge */}
+      <g transform={`translate(${padX}, 2)`}>
+        <polygon points="0,9 5,1 10,9" fill="rgba(87,212,106,1)" />
+        <text x="14" y="9" fontSize="9.5" fontWeight="700" fill="rgba(105,225,130,1)"
+          fontFamily="'Courier New', monospace" letterSpacing="0.4">+274.8%</text>
+      </g>
     </svg>
   );
 }
