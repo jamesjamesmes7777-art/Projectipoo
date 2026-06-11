@@ -1,11 +1,13 @@
 import { Shield, FileSearch } from 'lucide-react';
 import { Link } from 'wouter';
 import { useLang, type LangCode } from '../context/LangContext';
+import { useAllocation } from './AllocationModal';
 
 const LANGS: LangCode[] = ['en', 'el', 'it', 'de', 'es'];
 
 export default function Header() {
   const { lang, setLang, t } = useLang();
+  const { open: openAllocation } = useAllocation();
 
   return (
     <header
@@ -79,6 +81,7 @@ export default function Header() {
           </Link>
 
           <button
+            onClick={openAllocation}
             className="btn-primary px-4 py-2 rounded-lg text-white text-sm font-semibold tracking-wide whitespace-nowrap"
           >
             {t.header.btn_secure}

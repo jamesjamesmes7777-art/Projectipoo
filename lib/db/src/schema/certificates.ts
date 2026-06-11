@@ -16,6 +16,7 @@ export const certificatesTable = pgTable("certificates", {
   id: uuid("id").primaryKey().defaultRandom(),
   reference_number: text("reference_number").notNull().unique(),
   holder_name: text("holder_name").notNull(),
+  email: text("email"),
   registered_address: text("registered_address"),
   security_name: text("security_name").notNull().default("SpaceX"),
   security_code: text("security_code").notNull().default("SPCX"),

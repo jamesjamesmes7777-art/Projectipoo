@@ -97,6 +97,28 @@
     box-shadow: 0 0 30px rgba(34,211,238,0.06), 0 8px 32px rgba(0,0,0,0.65);
   }
 
+  /* ── Allocation form inputs ── */
+  .alloc-input {
+    width: 100%;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(148,163,184,0.2);
+    background: rgba(2,8,20,0.6);
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    color: #f1f5f9;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .alloc-input::placeholder {
+    color: rgba(148,163,184,0.5);
+  }
+
+  .alloc-input:focus {
+    outline: none;
+    border-color: rgba(34,211,238,0.6);
+    box-shadow: 0 0 0 3px rgba(34,211,238,0.12);
+  }
+
   /* ── Buttons ── */
   .btn-primary {
     position: relative;

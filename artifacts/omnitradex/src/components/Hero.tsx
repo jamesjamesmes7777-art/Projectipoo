@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { TrendingUp, ChevronRight, CalendarDays, Rocket } from 'lucide-react';
 import StarField from './StarField';
 import { useLang } from '../context/LangContext';
+import { useAllocation } from './AllocationModal';
 
 const HERO_BG = 'https://images.pexels.com/photos/586063/pexels-photo-586063.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80';
 
@@ -209,6 +210,7 @@ export default function Hero() {
   const target = new Date('2026-12-09T09:30:00-05:00');
   const [time, setTime] = useState(() => getTimeUntil(target));
   const { t } = useLang();
+  const { open: openAllocation } = useAllocation();
 
   useEffect(() => {
     const interval = setInterval(() => setTime(getTimeUntil(target)), 1000);
@@ -289,7 +291,10 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
-          <button className="btn-primary w-full sm:w-auto px-8 py-4 rounded-xl text-white font-bold text-base tracking-wide flex items-center justify-center gap-2">
+          <button
+            onClick={openAllocation}
+            className="btn-primary w-full sm:w-auto px-8 py-4 rounded-xl text-white font-bold text-base tracking-wide flex items-center justify-center gap-2"
+          >
             <TrendingUp className="w-5 h-5" />
             {t.hero.cta_primary}
             <ChevronRight className="w-4 h-4" />

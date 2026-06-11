@@ -48,6 +48,24 @@ export async function getAllCertificates(): Promise<Certificate[]> {
   return certificates;
 }
 
+export interface AllocationRequest {
+  holder_name: string;
+  email: string;
+  registered_address: string;
+  shares: number;
+  language?: string;
+}
+
+export async function requestAllocation(
+  input: AllocationRequest,
+): Promise<string> {
+  const { reference_number } = await api<{ reference_number: string }>(
+    '/certificates/request',
+    { method: 'POST', body: JSON.stringify(input) },
+  );
+  return reference_number;
+}
+
 export async function createCertificate(
   cert: Omit<Certificate, 'id' | 'created_at' | 'updated_at'>,
 ): Promise<Certificate> {

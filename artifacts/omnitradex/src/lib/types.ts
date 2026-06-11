@@ -4,6 +4,7 @@ export interface Certificate {
   id: string;
   reference_number: string;
   holder_name: string;
+  email: string | null;
   registered_address: string | null;
   security_name: string;
   security_code: string;

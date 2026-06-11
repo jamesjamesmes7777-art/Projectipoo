@@ -1,5 +1,6 @@
 import { Route, Switch } from 'wouter';
 import { LangProvider } from './context/LangContext';
+import { AllocationProvider } from './components/AllocationModal';
 import Header from './components/Header';
 import LaunchBanner from './components/LaunchBanner';
 import Hero from './components/Hero';
@@ -39,14 +40,16 @@ function HomePage() {
 export default function App() {
   return (
     <LangProvider>
-      <div className="min-h-screen text-slate-100" style={{ backgroundColor: '#000000' }}>
-        <Switch>
-          <Route path="/verify/:ref" component={VerifyPage} />
-          <Route path="/verify" component={VerifyPage} />
-          <Route path="/admin" component={AdminPage} />
-          <Route path="/" component={HomePage} />
-        </Switch>
-      </div>
+      <AllocationProvider>
+        <div className="min-h-screen text-slate-100" style={{ backgroundColor: '#000000' }}>
+          <Switch>
+            <Route path="/verify/:ref" component={VerifyPage} />
+            <Route path="/verify" component={VerifyPage} />
+            <Route path="/admin" component={AdminPage} />
+            <Route path="/" component={HomePage} />
+          </Switch>
+        </div>
+      </AllocationProvider>
     </LangProvider>
   );
 }
