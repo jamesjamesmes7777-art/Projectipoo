@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import type { Certificate } from '../lib/types';
 import { getCertStrings, fmtDate } from '../lib/certI18n';
-const signatureImg = new URL('../assets/289b44ca-9046-4539-ac63-d5ace6d23af8.png', import.meta.url).href;
+const signatureImg = new URL('../assets/signature-hickman.png', import.meta.url).href;
 const sealImg = new URL('../assets/Seal_no_BG-removebg-preview.png', import.meta.url).href;
 
 const CANVAS_W = 793;
@@ -312,7 +312,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               <img
                 src={signatureImg}
                 alt="Signature"
-                style={{ height: 86, maxWidth: 240, objectFit: 'contain', marginBottom: 0, display: 'block' }}
+                style={{ width: 220, height: 'auto', objectFit: 'contain', marginBottom: 2, display: 'block' }}
               />
               <div style={{ borderBottom: '1.5px solid #2d4a7a', width: 220, marginBottom: 5, marginTop: 2 }} />
               <p style={{
