@@ -143,17 +143,19 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
         <div style={{ flex: 1, display: 'flex', gap: 20, padding: '22px 28px 16px', minHeight: 0, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
 
           {/* ── LEFT COLUMN ── */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', textAlign: t.rtl ? 'right' : 'left' }}>
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', textAlign: t.rtl ? 'right' : 'left' }}>
 
+            <div>
             {/* Certify intro */}
             <p style={{ color: 'rgba(183,196,214,0.65)', fontSize: 12, letterSpacing: '0.04em', marginBottom: 4 }}>
               {t.certifyIntro}
             </p>
 
-            {/* Holder name - cursive */}
+            {/* Holder name */}
             <p style={{
-              fontFamily: "'Great Vibes', cursive",
-              fontSize: 52, color: '#ffffff', lineHeight: 1.1, marginBottom: 10,
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontStyle: 'italic', fontWeight: 600,
+              fontSize: 46, color: '#ffffff', lineHeight: 1.15, marginBottom: 10,
               textShadow: '0 2px 20px rgba(255,255,255,0.08)',
             }}>
               {cert.holder_name}
@@ -192,8 +194,11 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               ))}
             </div>
 
+            </div>
+
+            <div>
             {/* Ornamental divider */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0 12px' }}>
               <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, rgba(50,230,255,0.0), rgba(50,230,255,0.3))' }} />
               <svg width="40" height="12" viewBox="0 0 40 12">
                 <polygon points="20,1 23,5 20,9 17,5" fill="none" stroke="rgba(50,230,255,0.55)" strokeWidth="0.8" />
@@ -224,11 +229,13 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 {cert.shares}
               </p>
             </div>
+            </div>
           </div>
 
           {/* ── RIGHT COLUMN ── */}
-          <div style={{ flexShrink: 0, width: 316, display: 'flex', flexDirection: 'column', gap: 7 }}>
+          <div style={{ flexShrink: 0, width: 316, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 7 }}>
 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             {/* Data grid */}
             <div style={{ border: '1px solid rgba(50,230,255,0.35)', background: 'rgba(8,20,44,0.65)' }}>
               <GridRow label={t.registeredHolder} value={cert.holder_name} br rtl={t.rtl} />
@@ -285,6 +292,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 )}
               </div>
             </div>
+            </div>
 
             {/* Account manager strip */}
             {cert.account_manager && (
@@ -311,7 +319,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           flexShrink: 0,
           background: 'linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%)',
           borderTop: '3px solid #1B3A6B',
-          padding: '12px 28px',
+          padding: '18px 30px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
@@ -319,7 +327,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               <img
                 src={signatureImg}
                 alt="Signature"
-                style={{ height: 60, maxWidth: 200, objectFit: 'contain', marginBottom: 0, display: 'block' }}
+                style={{ height: 86, maxWidth: 240, objectFit: 'contain', marginBottom: 0, display: 'block' }}
               />
               <div style={{ borderBottom: '1.5px solid #2d4a7a', width: 220, marginBottom: 5, marginTop: 2 }} />
               <p style={{
@@ -346,7 +354,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               <img
                 src={sealImg}
                 alt="Official Seal"
-                style={{ width: 105, height: 105, objectFit: 'contain' }}
+                style={{ width: 150, height: 150, objectFit: 'contain' }}
               />
             </div>
           </div>
@@ -392,13 +400,13 @@ function GridRow({ label, value, br, cyan, green, divider, rtl }: {
       <div style={{
         borderRight: !rtl && br ? '1px solid rgba(50,230,255,0.18)' : undefined,
         borderLeft: rtl && br ? '1px solid rgba(50,230,255,0.18)' : undefined,
-        padding: '7px 10px',
+        padding: '10px 10px',
       }}>
         <p style={{ color: 'rgba(183,196,214,0.45)', fontSize: 8, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>
           {label}
         </p>
       </div>
-      <div style={{ padding: '7px 10px' }}>
+      <div style={{ padding: '10px 10px' }}>
         <p style={{
           fontSize: 11.5, fontWeight: 700, lineHeight: 1.35, whiteSpace: 'pre-line',
           color: cyan ? 'rgba(50,230,255,1)' : green ? 'rgba(87,212,106,1)' : '#ffffff',
