@@ -1,4 +1,5 @@
 import * as oidc from "openid-client";
+import crypto from "crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import {
   GetCurrentAuthUserResponse,
@@ -88,6 +89,49 @@ router.get("/auth/user", (req: Request, res: Response) => {
       user: req.isAuthenticated() ? req.user : null,
     }),
   );
+});
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "Admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "Admin@2026!";
+
+// Constant-time string comparison (hash to a fixed length first so inputs of
+// differing length don't throw and don't leak length via timing).
+function safeEqual(a: string, b: string): boolean {
+  const ah = crypto.createHash("sha256").update(a).digest();
+  const bh = crypto.createHash("sha256").update(b).digest();
+  return crypto.timingSafeEqual(ah, bh);
+}
+
+router.post("/auth/admin-login", async (req: Request, res: Response) => {
+  const username = typeof req.body?.username === "string" ? req.body.username : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+
+  const ok =
+    safeEqual(username, ADMIN_USERNAME) && safeEqual(password, ADMIN_PASSWORD);
+  if (!ok) {
+    res.status(401).json({ error: "Invalid username or password" });
+    return;
+  }
+
+  const sid = await createSession({
+    user: {
+      id: "admin",
+      email: null,
+      firstName: ADMIN_USERNAME,
+      lastName: null,
+      profileImageUrl: null,
+    },
+    access_token: "",
+    isAdmin: true,
+  });
+  setSessionCookie(res, sid);
+  res.json({ success: true });
+});
+
+router.post("/auth/admin-logout", async (req: Request, res: Response) => {
+  const sid = getSessionId(req);
+  await clearSession(res, sid);
+  res.json({ success: true });
 });
 
 router.get("/login", async (req: Request, res: Response) => {

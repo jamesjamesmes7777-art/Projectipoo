@@ -18,6 +18,8 @@ declare global {
       isAuthenticated(): this is AuthedRequest;
 
       user?: User | undefined;
+
+      isAdmin?: boolean;
     }
 
     export interface AuthedRequest {
@@ -61,6 +63,7 @@ export async function authMiddleware(
   req.isAuthenticated = function (this: Request) {
     return this.user != null;
   } as Request["isAuthenticated"];
+  req.isAdmin = false;
 
   const sid = getSessionId(req);
   if (!sid) {
@@ -83,5 +86,6 @@ export async function authMiddleware(
   }
 
   req.user = refreshed.user;
+  req.isAdmin = !!refreshed.isAdmin;
   next();
 }

@@ -1,19 +1,16 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { db, auditLogsTable } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
-import { ensureAdminAccess, requireAdmin } from "../middlewares/requireAdmin";
+import { requireAdmin } from "../middlewares/requireAdmin";
 
 const router: IRouter = Router();
 
 // Returns the current user along with whether they have admin access.
-// The first authenticated user is bootstrapped as the initial admin.
-router.get("/admin/me", async (req: Request, res: Response): Promise<void> => {
-  if (!req.isAuthenticated()) {
-    res.json({ user: null, isAdmin: false });
-    return;
-  }
-  const isAdmin = await ensureAdminAccess(req.user.id, req.user.email ?? null);
-  res.json({ user: req.user, isAdmin });
+router.get("/admin/me", (req: Request, res: Response): void => {
+  res.json({
+    user: req.isAuthenticated() ? req.user : null,
+    isAdmin: !!req.isAdmin,
+  });
 });
 
 // Admin: list audit logs, optionally filtered by certificate.

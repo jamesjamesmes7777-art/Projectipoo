@@ -16,6 +16,26 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export async function getAdminMe(): Promise<boolean> {
+  try {
+    const { isAdmin } = await api<{ isAdmin: boolean }>('/admin/me');
+    return !!isAdmin;
+  } catch {
+    return false;
+  }
+}
+
+export async function adminLogin(username: string, password: string): Promise<void> {
+  await api('/auth/admin-login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password }),
+  });
+}
+
+export async function adminLogout(): Promise<void> {
+  await api('/auth/admin-logout', { method: 'POST' });
+}
+
 export async function getCertificateByRef(ref: string): Promise<Certificate | null> {
   const { certificate } = await api<{ certificate: Certificate | null }>(
     `/certificates/verify/${encodeURIComponent(ref.trim())}`,

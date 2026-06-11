@@ -4,7 +4,6 @@ import {
   RotateCcw, Trash2, Eye, Clock, ChevronRight, ShieldCheck, AlertTriangle, Filter,
   ArrowUpDown, Link2, ExternalLink, X, Loader2,
 } from 'lucide-react';
-import { useAuth } from '@workspace/replit-auth-web';
 import {
   getAllCertificates, createCertificate, updateCertificate,
   setApprovalStatus, deleteCertificate, getAuditLogs,
@@ -36,8 +35,11 @@ type ToastKind = 'success' | 'error';
 interface AdminToast { id: number; kind: ToastKind; message: string; }
 let toastSeq = 0;
 
-export default function AdminDashboard() {
-  const { logout } = useAuth();
+interface AdminDashboardProps {
+  onLogout: () => void;
+}
+
+export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,7 +187,7 @@ export default function AdminDashboard() {
 
         <div className="p-3 border-t border-slate-800/60">
           <button
-            onClick={() => logout()}
+            onClick={() => onLogout()}
             className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/5 text-sm font-medium transition-all"
           >
             <LogOut className="w-4 h-4" />

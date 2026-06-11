@@ -11,13 +11,14 @@ A SpaceX share-certificate verification platform. The public can verify an issue
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only; prompts for destructive changes)
 - Required env: `DATABASE_URL` — Postgres connection string; `SESSION_SECRET`
+- Optional env: `ADMIN_USERNAME` / `ADMIN_PASSWORD` override the admin credentials (defaults: `Admin` / `Admin@2026!`)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
-- Auth: Replit Auth (OpenID Connect via `openid-client`), session-cookie based
+- Auth: credential-based admin login (fixed username/password) on a server-side session cookie. The Replit Auth / OpenID Connect (`openid-client`) routes remain wired but are unused by the admin UI.
 - Frontend: React 19 + Vite + Tailwind v3 + wouter (ported verbatim from a Bolt export)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
@@ -33,7 +34,7 @@ A SpaceX share-certificate verification platform. The public can verify an issue
 ## Architecture decisions
 
 - Certificate endpoints are validated with `drizzle-zod` schemas and are intentionally NOT in the OpenAPI spec; only auth endpoints are codegen'd. The frontend calls `/api/...` with absolute paths (the shared proxy routes `/api` most-specific-first), `credentials: "include"`.
-- Admin bootstrap: the first authenticated user to hit an admin route becomes the sole admin. This is serialized with a transaction-scoped Postgres advisory lock (`pg_advisory_xact_lock`) so exactly one admin can ever be created and authorization always reflects actual `admins` membership.
+- Admin auth: `POST /api/auth/admin-login` validates a fixed username/password (constant-time compare) and creates a server-side session flagged `isAdmin: true`; `authMiddleware` propagates that flag to `req.isAdmin` and `requireAdmin` gates on it. `POST /api/auth/admin-logout` destroys the session. The synthetic admin session user has id `"admin"` (stored in `created_by`/`approved_by`/`performed_by`, which are plain `text` with no FK). The `admins` table and its advisory-lock bootstrap are no longer used.
 - Public verify returns a certificate only when `approval_status = 'APPROVED'`; otherwise `{ certificate: null }`.
 - Money fields (`allocation_price`, `total_consideration`) use `doublePrecision` (not `numeric`) so Drizzle returns JS numbers the ported frontend expects.
 

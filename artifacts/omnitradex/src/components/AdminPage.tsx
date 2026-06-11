@@ -1,33 +1,31 @@
-import { useEffect, useState } from 'react';
-import { LogOut } from 'lucide-react';
-import { useAuth } from '@workspace/replit-auth-web';
+import { useCallback, useEffect, useState } from 'react';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
+import { getAdminMe, adminLogout } from '../lib/certificates';
+
+type Status = 'loading' | 'unauthed' | 'authed';
 
 export default function AdminPage() {
-  const { isAuthenticated, isLoading, login, logout } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [status, setStatus] = useState<Status>('loading');
+
+  const checkAuth = useCallback(async () => {
+    const isAdmin = await getAdminMe();
+    setStatus(isAdmin ? 'authed' : 'unauthed');
+  }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setIsAdmin(null);
-      return;
-    }
-    let cancelled = false;
-    fetch('/api/admin/me', { credentials: 'include' })
-      .then((res) => res.json())
-      .then((data: { isAdmin?: boolean }) => {
-        if (!cancelled) setIsAdmin(!!data.isAdmin);
-      })
-      .catch(() => {
-        if (!cancelled) setIsAdmin(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [isAuthenticated]);
+    checkAuth();
+  }, [checkAuth]);
 
-  if (isLoading || (isAuthenticated && isAdmin === null)) {
+  const handleLogout = useCallback(async () => {
+    try {
+      await adminLogout();
+    } finally {
+      setStatus('unauthed');
+    }
+  }, []);
+
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#000811' }}>
         <div className="w-8 h-8 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
@@ -35,27 +33,9 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAuthenticated) return <AdminLogin onLogin={login} />;
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#000811' }}>
-        <div className="w-full max-w-sm text-center">
-          <h1 className="text-2xl font-black text-white tracking-tight mb-2">Access Denied</h1>
-          <p className="text-slate-500 text-sm mb-8">
-            You are not an authorised administrator.
-          </p>
-          <button
-            onClick={() => logout()}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm transition-all"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
-      </div>
-    );
+  if (status === 'unauthed') {
+    return <AdminLogin onLogin={checkAuth} />;
   }
 
-  return <AdminDashboard />;
+  return <AdminDashboard onLogout={handleLogout} />;
 }
