@@ -155,6 +155,7 @@ export default function MissionManifest() {
       stat1: t.mission.falcon_stat1,
       stat2: t.mission.falcon_stat2,
       desc: t.mission.falcon_desc,
+      url: 'https://www.spacex.com/vehicles/falcon-heavy/',
       bars: [
         { label: 'Reliability', value: '99.2%', pct: 99 },
         { label: 'Reuse rate', value: '84%', pct: 84 },
@@ -165,6 +166,7 @@ export default function MissionManifest() {
       stat1: t.mission.starlink_stat1,
       stat2: t.mission.starlink_stat2,
       desc: t.mission.starlink_desc,
+      url: 'https://www.starlink.com/',
       bars: [
         { label: 'Coverage', value: '72 countries', pct: 72 },
         { label: 'Active sats', value: '6,800+', pct: 88 },
@@ -175,6 +177,7 @@ export default function MissionManifest() {
       stat1: t.mission.starship_stat1,
       stat2: t.mission.starship_stat2,
       desc: t.mission.starship_desc,
+      url: 'https://www.spacex.com/vehicles/starship/',
       bars: [
         { label: 'Payload (LEO)', value: '150 t', pct: 95 },
         { label: 'Test flights', value: '8 complete', pct: 80 },
@@ -216,7 +219,7 @@ export default function MissionManifest() {
                 onMouseLeave={() => setHovered(null)}
               >
                 {/* Photo header */}
-                <div className="relative h-44 overflow-hidden">
+                <a href={m.url} target="_blank" rel="noopener noreferrer" className="block relative h-44 overflow-hidden">
                   <img
                     src={photo}
                     alt={m.name}
@@ -243,7 +246,7 @@ export default function MissionManifest() {
                       {style.icon}
                     </div>
                   </div>
-                </div>
+                </a>
 
                 {/* Corner lines */}
                 <div className="absolute top-0 left-0 right-0 h-px"
@@ -265,7 +268,10 @@ export default function MissionManifest() {
                     ))}
                   </div>
 
-                  <button
+                  <a
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300"
                     style={{
                       background: isHov ? `${style.accentColor}18` : 'rgba(255,255,255,0.04)',
@@ -275,7 +281,7 @@ export default function MissionManifest() {
                   >
                     Mission Details
                     <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
+                  </a>
                 </div>
               </div>
             );

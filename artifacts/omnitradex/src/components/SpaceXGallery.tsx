@@ -17,24 +17,28 @@ const GALLERY = [
   },
   {
     img: falconDay,
+    link: 'https://www.starlink.com/',
     title: 'Deep Space Operations',
     sub: 'Starlink Mega-Constellation',
     span: 'col-span-1 row-span-1',
   },
   {
     img: dragonEarth,
+    link: 'https://www.spacex.com/vehicles/dragon/',
     title: 'Earth from Orbit',
     sub: 'Dragon Crew · ISS Approach',
     span: 'col-span-1 row-span-1',
   },
   {
     img: crewLaunch,
+    link: 'https://www.spacex.com/launches/mission/?missionId=crew-10',
     title: 'Crew Dragon Launch',
     sub: 'Crew-10 · LC-39A Kennedy',
     span: 'col-span-1 row-span-1',
   },
   {
     img: dragonDocking,
+    link: 'https://www.spacex.com/vehicles/dragon/',
     title: 'Orbital Station',
     sub: 'Dragon Docking · 400km Altitude',
     span: 'col-span-1 row-span-1',
@@ -58,6 +62,7 @@ function GalleryCard({ item, index }: GalleryCardProps) {
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const videoUrl = 'videoUrl' in item ? item.videoUrl : undefined;
+  const link = 'link' in item ? item.link : undefined;
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
@@ -144,6 +149,17 @@ function GalleryCard({ item, index }: GalleryCardProps) {
             className="absolute inset-0 z-20 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           />
         </>
+      )}
+
+      {/* Photo tile: full-card link to official SpaceX page */}
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`View ${item.title} on SpaceX`}
+          className="absolute inset-0 z-20 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        />
       )}
 
       {/* Corner bracket */}
