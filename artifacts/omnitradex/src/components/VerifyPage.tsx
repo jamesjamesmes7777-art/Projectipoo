@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, AlertCircle, Download, CheckCircle, ArrowLeft, Globe } from 'lucide-react';
+import { Search, AlertCircle, Download, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useRoute, Link } from 'wouter';
 import CertificateView from './CertificateView';
 import { getCertificateByRef } from '../lib/certificates';
 import { generateQRDataUrl, exportCertificatePDF } from '../lib/pdfExport';
-import { CERT_LANGS, type CertLang } from '../lib/certI18n';
 import type { Certificate } from '../lib/types';
 
 export default function VerifyPage() {
@@ -15,7 +14,6 @@ export default function VerifyPage() {
   const [qrUrl, setQrUrl] = useState<string>('');
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const [selectedLang, setSelectedLang] = useState<CertLang>('en');
   const certRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ export default function VerifyPage() {
     const result = await getCertificateByRef(ref);
     if (result && result.approval_status === 'APPROVED') {
       setCert(result);
-      setSelectedLang((result.language as CertLang) ?? 'en');
       setStatus('found');
       const qr = await generateQRDataUrl(`${window.location.origin}/verify/${result.reference_number}`);
       setQrUrl(qr);
@@ -124,31 +121,11 @@ export default function VerifyPage() {
         {/* Found */}
         {status === 'found' && cert && (
           <div>
-            {/* Toolbar: verified badge + language picker + download */}
+            {/* Toolbar: verified badge + download */}
             <div className="flex items-center justify-center gap-3 mb-8 flex-wrap">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/8 text-emerald-400 text-sm font-semibold">
                 <CheckCircle className="w-4 h-4" />
                 Certificate Verified
-              </div>
-
-              {/* Language selector */}
-              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-slate-700/50">
-                <Globe className="w-3.5 h-3.5 text-slate-500 ml-2" />
-                {CERT_LANGS.map(l => (
-                  <button
-                    key={l.code}
-                    onClick={() => setSelectedLang(l.code)}
-                    title={l.label}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      selectedLang === l.code
-                        ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/25'
-                        : 'text-slate-500 hover:text-slate-300'
-                    }`}
-                  >
-                    <span className="text-sm leading-none">{l.flag}</span>
-                    <span className="hidden sm:inline">{l.code.toUpperCase()}</span>
-                  </button>
-                ))}
               </div>
 
               <button
@@ -166,11 +143,6 @@ export default function VerifyPage() {
               <p className="text-center text-red-400 text-xs mb-4">{exportError}</p>
             )}
 
-            {/* Language label */}
-            <p className="text-center text-slate-600 text-xs mb-6">
-              Viewing in {CERT_LANGS.find(l => l.code === selectedLang)?.label}
-            </p>
-
             {/* Certificate — scaled to fit screen */}
             <div className="flex justify-center">
               <div style={{
@@ -180,7 +152,7 @@ export default function VerifyPage() {
                 flexShrink: 0,
               }}>
                 <div style={{ transform: 'scale(0.75)', transformOrigin: 'top left', width: 793 }}>
-                  <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language={selectedLang} />
+                  <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language="en" />
                 </div>
               </div>
             </div>

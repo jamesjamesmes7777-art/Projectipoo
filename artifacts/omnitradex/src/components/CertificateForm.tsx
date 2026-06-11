@@ -40,8 +40,13 @@ export default function CertificateForm({ initial, onSave, onCancel }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  function toTitleCase(s: string) {
+    return s.replace(/\b\w/g, c => c.toUpperCase());
+  }
+
   const set = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const val = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
+    let val: string | number = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
+    if (field === 'holder_name' && typeof val === 'string') val = toTitleCase(val);
     setForm(f => {
       const updated = { ...f, [field]: val };
       if (field === 'shares' || field === 'allocation_price') {

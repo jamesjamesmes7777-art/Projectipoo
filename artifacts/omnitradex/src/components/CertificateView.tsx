@@ -8,6 +8,10 @@ const sealImg = new URL('../assets/Seal_no_BG-removebg-preview.png', import.meta
 const CANVAS_W = 793;
 const CANVAS_H = 1122;
 
+function toTitleCase(s: string) {
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+}
+
 interface Props {
   cert: Certificate;
   qrDataUrl?: string;
@@ -154,7 +158,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
               letterSpacing: '0.01em',
               textShadow: '0 2px 20px rgba(255,255,255,0.08)',
             }}>
-              {cert.holder_name}
+              {toTitleCase(cert.holder_name)}
             </p>
 
             {/* Thin decorative rule under name */}
