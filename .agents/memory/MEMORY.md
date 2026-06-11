@@ -1,0 +1,2 @@
+- [Admin bootstrap pattern](admin-bootstrap.md) — first authed user becomes sole admin; must serialize with a Postgres advisory lock or concurrent first-logins create multiple admins.
+- [drizzle-kit push in CI](drizzle-push-tty.md) — push prompts interactively for destructive DDL (UNIQUE on populated tables) and fails in the non-TTY shell; apply such DDL directly via SQL.
