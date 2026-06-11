@@ -397,7 +397,7 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           flexDirection: t.rtl ? 'row-reverse' : 'row',
         }}>
           <p style={{ color: 'rgba(183,196,214,0.32)', fontSize: 7.5, textTransform: 'uppercase', letterSpacing: '0.14em' }}>
-            OmniTradeX Pre-IPO Securities Registry &bull; omnitradex.com
+            OmniTradeX Pre-IPO Securities Registry
           </p>
           <p style={{ color: 'rgba(183,196,214,0.32)', fontSize: 7.5, fontFamily: 'monospace', letterSpacing: '0.05em' }}>
             {cert.reference_number}
