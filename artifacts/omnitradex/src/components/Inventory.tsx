@@ -146,7 +146,7 @@ export default function Inventory() {
             label={t.inventory.alloc_shares}
             value={fmtNum(allocated)}
             suffix={`${allocatedPct}% ${t.inventory.p_allocated.toLowerCase()}`}
-            accent="text-slate-400"
+            accent="text-emerald-400"
             icon={<TrendingUp className="w-3.5 h-3.5" />}
             delay={100}
           />

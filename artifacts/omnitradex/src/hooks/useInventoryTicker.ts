@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 const TOTAL = 12_820_512;
-const INITIAL_PCT = 14.0;
+const INITIAL_PCT = 55.3;
 const INITIAL_INVESTORS = 1424;
 const TICK_MS = 30_000;
 
