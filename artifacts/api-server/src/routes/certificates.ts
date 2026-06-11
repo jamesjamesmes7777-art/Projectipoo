@@ -113,12 +113,15 @@ router.post(
     }
 
     const userId = req.user!.id;
+    const now = new Date();
     const updates: Record<string, unknown> = {
       approval_status: parsed.data.status,
     };
     if (parsed.data.status === "APPROVED") {
       updates.approved_by = userId;
-      updates.approved_at = new Date();
+      updates.approved_at = now;
+      // The certificate's issue date is generated at the moment of approval.
+      updates.issue_date = now.toISOString().slice(0, 10);
     }
 
     const [cert] = await db
