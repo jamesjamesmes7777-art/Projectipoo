@@ -14,6 +14,7 @@ export default function VerifyPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'found' | 'notfound'>('idle');
   const [qrUrl, setQrUrl] = useState<string>('');
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<CertLang>('en');
   const certRef = useRef<HTMLDivElement>(null);
 
@@ -44,8 +45,11 @@ export default function VerifyPage() {
   async function handleExport() {
     if (!certRef.current || !cert) return;
     setExporting(true);
+    setExportError(null);
     try {
       await exportCertificatePDF(certRef.current, `certificate-${cert.reference_number}.pdf`);
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Export failed. Please try again.');
     } finally {
       setExporting(false);
     }
@@ -156,6 +160,11 @@ export default function VerifyPage() {
                 {exporting ? 'Exporting…' : 'Download PDF'}
               </button>
             </div>
+
+            {/* Export error */}
+            {exportError && (
+              <p className="text-center text-red-400 text-xs mb-4">{exportError}</p>
+            )}
 
             {/* Language label */}
             <p className="text-center text-slate-600 text-xs mb-6">

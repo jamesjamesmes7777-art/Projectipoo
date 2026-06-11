@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { toPng } from 'html-to-image';
 
 export async function generateQRDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, {
@@ -12,18 +13,19 @@ export async function exportCertificatePDF(
   element: HTMLElement,
   filename: string,
 ): Promise<void> {
-  const { default: html2canvas } = await import('html2canvas');
   const { jsPDF } = await import('jspdf');
 
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#061326',
+  const imgData = await toPng(element, {
+    cacheBust: true,
+    pixelRatio: 2,
     width: 793,
     height: 1122,
+    style: {
+      transform: 'none',
+      transformOrigin: 'top left',
+    },
   });
 
-  const imgData = canvas.toDataURL('image/png', 1.0);
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pdfW = pdf.internal.pageSize.getWidth();
   const pdfH = pdf.internal.pageSize.getHeight();
