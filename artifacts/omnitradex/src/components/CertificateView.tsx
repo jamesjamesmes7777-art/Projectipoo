@@ -86,31 +86,21 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           borderBottom: '1px solid rgba(34,211,238,0.15)',
           background: 'rgba(4,10,24,0.55)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
-            {/* OTX Hexagon */}
-            <div style={{ position: 'relative', flexShrink: 0, width: 80, height: 92 }}>
-              <svg viewBox="0 0 88 100" width="80" height="92">
-                <polygon points="44,3 83,25 83,75 44,97 5,75 5,25"
-                  fill="rgba(34,211,238,0.06)" stroke="rgba(34,211,238,0.7)" strokeWidth="1.6" />
-                <polygon points="44,11 75,29 75,71 44,89 13,71 13,29"
-                  fill="none" stroke="rgba(34,211,238,0.22)" strokeWidth="0.8" />
-              </svg>
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: 'rgba(34,211,238,0.94)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.5px' }}>OTX</span>
-              </div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22 }}>
+            {/* OTX Hexagon (left) */}
+            <OtxHex />
 
-            <div style={{ flexShrink: 0, width: 1, height: 68, background: 'rgba(34,211,238,0.2)', margin: '0 22px' }} />
+            <div style={{ flexShrink: 0, width: 1, height: 68, background: 'rgba(34,211,238,0.2)' }} />
 
             {/* Title block */}
-            <div style={{ flex: 1, textAlign: t.rtl ? 'right' : 'left' }}>
+            <div style={{ textAlign: 'center' }}>
               <p style={{ color: 'rgba(183,196,214,0.75)', fontSize: 9.5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.22em', marginBottom: 5 }}>
                 {t.registry}
               </p>
               <h1 style={{ color: '#ffffff', fontSize: 38, fontWeight: 900, textTransform: 'uppercase', lineHeight: 1.05, letterSpacing: '-0.5px', margin: 0 }}>
                 {t.certTitle1}<br />{t.certTitle2}
               </h1>
-              <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 10, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
+              <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
                   padding: '4px 12px', borderRadius: 20,
@@ -136,6 +126,11 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 </div>
               </div>
             </div>
+
+            <div style={{ flexShrink: 0, width: 1, height: 68, background: 'rgba(34,211,238,0.2)' }} />
+
+            {/* OTX Hexagon (right) */}
+            <OtxHex />
           </div>
         </div>
 
@@ -390,6 +385,24 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
 CertificateView.displayName = 'CertificateView';
 export default CertificateView;
+
+// ── OTX hexagon emblem ──────────────────────────────────────────────────────────
+
+function OtxHex() {
+  return (
+    <div style={{ position: 'relative', flexShrink: 0, width: 80, height: 92 }}>
+      <svg viewBox="0 0 88 100" width="80" height="92">
+        <polygon points="44,3 83,25 83,75 44,97 5,75 5,25"
+          fill="rgba(34,211,238,0.06)" stroke="rgba(34,211,238,0.7)" strokeWidth="1.6" />
+        <polygon points="44,11 75,29 75,71 44,89 13,71 13,29"
+          fill="none" stroke="rgba(34,211,238,0.22)" strokeWidth="0.8" />
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ color: 'rgba(34,211,238,0.94)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.5px' }}>OTX</span>
+      </div>
+    </div>
+  );
+}
 
 // ── Framed box with corner brackets ────────────────────────────────────────────
 

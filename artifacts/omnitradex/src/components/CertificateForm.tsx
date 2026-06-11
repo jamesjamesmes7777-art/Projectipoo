@@ -12,6 +12,7 @@ interface Props {
 const EMPTY: Omit<Certificate, 'id' | 'created_at' | 'updated_at'> = {
   reference_number: '',
   holder_name: '',
+  email: null,
   registered_address: '',
   security_name: 'SpaceX',
   security_code: 'SPCX',
