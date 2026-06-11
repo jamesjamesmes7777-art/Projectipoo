@@ -210,22 +210,18 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
             </div>
 
             {/* SHARES HELD */}
-            <div>
-              <div style={{ marginBottom: 12 }}>
-                <p style={{ color: 'rgba(183,196,214,0.45)', fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 2 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ color: 'rgba(183,196,214,0.55)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: 4 }}>
                   {t.certNo}
                 </p>
-                <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em', direction: 'ltr' }}>
+                <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 22, fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.04em', direction: 'ltr' }}>
                   {cert.certificate_number}
                 </p>
               </div>
               <p style={{
-                color: 'rgba(255,255,255,0.92)', fontSize: 11, fontWeight: 800,
+                color: 'rgba(255,255,255,0.92)', fontSize: 13, fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.3em', marginBottom: 0,
-                borderLeft: t.rtl ? undefined : '2px solid rgba(50,230,255,0.6)',
-                borderRight: t.rtl ? '2px solid rgba(50,230,255,0.6)' : undefined,
-                paddingLeft: t.rtl ? undefined : 10,
-                paddingRight: t.rtl ? 10 : undefined,
               }}>
                 {t.sharesHeld}
               </p>
@@ -330,12 +326,6 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 <p><span style={{ color: '#6b7a9e', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
                 <p><span style={{ color: '#6b7a9e', display: 'inline-block', minWidth: 34, fontSize: 8.5 }}>{t.dateLabel}</span> {issueDate}</p>
               </div>
-            </div>
-
-            {/* Center: certificate number stamp */}
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#94a3b8', fontSize: 7.5, textTransform: 'uppercase', letterSpacing: '0.14em', marginBottom: 2 }}>Certificate</p>
-              <p style={{ color: '#1e3a5f', fontSize: 9, fontWeight: 800, fontFamily: 'monospace' }}>{cert.certificate_number}</p>
             </div>
 
             {/* Seal */}
