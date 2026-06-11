@@ -315,7 +315,13 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 18, flexDirection: t.rtl ? 'row-reverse' : 'row' }}>
             {/* Signature block */}
             <div style={{ textAlign: t.rtl ? 'right' : 'left', flexShrink: 0 }}>
-              <div style={{ display: 'inline-block', marginBottom: 14 }}>
+              <p style={{
+                color: 'rgba(50,230,255,0.9)', fontSize: 8.5, fontWeight: 800,
+                textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 10,
+              }}>
+                {t.authorisedSig}
+              </p>
+              <div style={{ display: 'inline-block', marginTop: 8, marginBottom: 14 }}>
                 <CornerBox pad="9px 15px">
                   <img
                     src={signatureImg}
@@ -324,12 +330,6 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                   />
                 </CornerBox>
               </div>
-              <p style={{
-                color: 'rgba(50,230,255,0.9)', fontSize: 8.5, fontWeight: 800,
-                textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 7,
-              }}>
-                {t.authorisedSig}
-              </p>
               <div style={{ color: '#ffffff', fontSize: 9.5, lineHeight: 1.75 }}>
                 <p><span style={{ color: 'rgba(255,255,255,0.55)', display: 'inline-block', minWidth: 36, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.nameLabel}</span> Mr. Simon Mark Hickman</p>
                 <p><span style={{ color: 'rgba(255,255,255,0.55)', display: 'inline-block', minWidth: 36, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.titleLabel}</span> Chief Executive, Omni Wealth Ltd</p>
@@ -344,19 +344,21 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
 
             {/* Seal */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <CornerBox pad={9}>
-                <img
-                  src={sealImg}
-                  alt="Official Seal"
-                  style={{ width: 132, height: 132, objectFit: 'contain', display: 'block' }}
-                />
-              </CornerBox>
               <p style={{
                 color: 'rgba(50,230,255,0.7)', fontSize: 8, fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.24em',
               }}>
                 {t.officialSeal}
               </p>
+              <div style={{ marginTop: 8 }}>
+                <CornerBox pad={9}>
+                  <img
+                    src={sealImg}
+                    alt="Official Seal"
+                    style={{ width: 132, height: 132, objectFit: 'contain', display: 'block' }}
+                  />
+                </CornerBox>
+              </div>
             </div>
           </div>
         </div>
