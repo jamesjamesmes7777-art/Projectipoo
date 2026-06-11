@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Rocket, Satellite, Globe2, ArrowUpRight } from 'lucide-react';
 import { useLang } from '../context/LangContext';
+import falconStill from '../assets/spacex/falcon9-launch.png';
+import starlinkImg from '../assets/spacex/starlink-constellation.png';
+import starshipStill from '../assets/spacex/starship.png';
 
-const MISSION_PHOTOS = [
-  'https://images.pexels.com/photos/586063/pexels-photo-586063.jpeg?auto=compress&cs=tinysrgb&w=800&q=80',
-  'https://images.pexels.com/photos/2150/sky-space-dark-galaxy.jpg?auto=compress&cs=tinysrgb&w=800&q=80',
-  'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=800&q=80',
-];
+const MISSION_PHOTOS = [falconStill, starlinkImg, starshipStill];
 
 /* ── Blueprint SVGs ─────────────────────────────────────────────────────────── */
 

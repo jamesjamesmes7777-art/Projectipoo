@@ -1,0 +1,38 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "eAkMxXO5r_lu0gMUZp0op"
+uri = "file://artifacts/omnitradex/src/assets/spacex/starlink-constellation.png"
+type = "image"
+title = "starlink constellation"
+
+[[generated]]
+id = "_nO5BeC8xGDohH99iFB8i"
+uri = "file://artifacts/omnitradex/src/assets/spacex/earth-orbit.png"
+type = "image"
+title = "earth from orbit"
+
+[[generated]]
+id = "qNNJnNJ43wBTZkre3YSus"
+uri = "file://artifacts/omnitradex/src/assets/spacex/milkyway-launch.png"
+type = "image"
+title = "milky way launch window"
+
+[[generated]]
+id = "rTtgZk2rshtTr2iYE0p4P"
+uri = "file://artifacts/omnitradex/src/assets/spacex/orbital-station.png"
+type = "image"
+title = "orbital station"
+
+[[generated]]
+id = "z-EjEkjfhAmQtuMRA9BmH"
+uri = "file://artifacts/omnitradex/src/assets/spacex/falcon9-launch.png"
+type = "image"
+title = "falcon 9 launch"
+
+[[generated]]
+id = "Pa-GdWCzFbSFIGBu-zHd9"
+uri = "file://artifacts/omnitradex/src/assets/spacex/starship.png"
+type = "image"
+title = "starship vehicle"

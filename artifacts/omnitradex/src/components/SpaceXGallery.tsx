@@ -1,60 +1,67 @@
 import { useState, useEffect, useRef } from 'react';
-import { ExternalLink, Play } from 'lucide-react';
+import { ExternalLink, Volume2, VolumeX } from 'lucide-react';
+import falconNightVideo from '../assets/spacex/falcon9-night-launch.mp4';
+import starshipVideo from '../assets/spacex/starship-ascent.mp4';
+import falconStill from '../assets/spacex/falcon9-launch.png';
+import starshipStill from '../assets/spacex/starship.png';
+import starlinkImg from '../assets/spacex/starlink-constellation.png';
+import earthImg from '../assets/spacex/earth-orbit.png';
+import milkywayImg from '../assets/spacex/milkyway-launch.png';
+import stationImg from '../assets/spacex/orbital-station.png';
 
 const GALLERY = [
   {
-    img: 'https://images.pexels.com/photos/586063/pexels-photo-586063.jpeg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: falconStill,
+    video: falconNightVideo,
     title: 'Falcon 9 Night Launch',
     sub: 'T+0:00 · Kennedy Space Center',
     span: 'col-span-2 row-span-2',
-    hasVideo: true,
   },
   {
-    img: 'https://images.pexels.com/photos/2150/sky-space-dark-galaxy.jpg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: starlinkImg,
     title: 'Deep Space Operations',
     sub: 'Starlink Mega-Constellation',
     span: 'col-span-1 row-span-1',
-    hasVideo: false,
   },
   {
-    img: 'https://images.pexels.com/photos/87651/earth-blue-planet-globe-planet-87651.jpeg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: earthImg,
     title: 'Earth from Orbit',
     sub: 'Dragon Crew · ISS Approach',
     span: 'col-span-1 row-span-1',
-    hasVideo: false,
   },
   {
-    img: 'https://images.pexels.com/photos/1169754/pexels-photo-1169754.jpeg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: milkywayImg,
     title: 'Milky Way · Launch Window',
     sub: 'Booster Recovery · LZ-1',
     span: 'col-span-1 row-span-1',
-    hasVideo: false,
   },
   {
-    img: 'https://images.pexels.com/photos/39896/space-station-moon-astronaut-starry-sky-39896.jpeg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: stationImg,
     title: 'Orbital Station',
     sub: 'Dragon Docking · 400km Altitude',
     span: 'col-span-1 row-span-1',
-    hasVideo: false,
   },
   {
-    img: 'https://images.pexels.com/photos/2166/flight-sky-earth-space.jpg?auto=compress&cs=tinysrgb&w=900&q=80',
+    img: starshipStill,
+    video: starshipVideo,
     title: 'Starship Ascent',
     sub: 'IFT-8 · Full Stack Integration',
     span: 'col-span-2 row-span-1',
-    hasVideo: true,
   },
-];
+] as const;
 
 interface GalleryCardProps {
-  item: typeof GALLERY[0];
+  item: typeof GALLERY[number];
   index: number;
 }
 
 function GalleryCard({ item, index }: GalleryCardProps) {
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [muted, setMuted] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hasVideo = 'video' in item && Boolean(item.video);
 
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
@@ -63,6 +70,15 @@ function GalleryCard({ item, index }: GalleryCardProps) {
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
+
+  const toggleSound = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const next = !muted;
+    setMuted(next);
+    v.muted = next;
+    if (!next) { v.play().catch(() => {}); }
+  };
 
   return (
     <div
@@ -77,16 +93,34 @@ function GalleryCard({ item, index }: GalleryCardProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Photo */}
-      <img
-        src={item.img}
-        alt={item.title}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
-          transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
-        }}
-      />
+      {/* Video (auto-playing) or Photo */}
+      {hasVideo ? (
+        <video
+          ref={videoRef}
+          src={item.video}
+          poster={item.img}
+          autoPlay
+          loop
+          muted={muted}
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
+            transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
+          }}
+        />
+      ) : (
+        <img
+          src={item.img}
+          alt={item.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
+            transition: 'transform 0.7s cubic-bezier(0.22,1,0.36,1)',
+          }}
+        />
+      )}
 
       {/* Base gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -118,20 +152,25 @@ function GalleryCard({ item, index }: GalleryCardProps) {
         }}
       />
 
-      {/* Play button for video items */}
-      {item.hasVideo && (
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-400"
-          style={{
-            opacity: hovered ? 1 : 0.5,
-            transform: `translate(-50%, -50%) scale(${hovered ? 1.1 : 1})`,
-          }}
-        >
-          <div className="w-14 h-14 rounded-full border-2 border-white/60 bg-black/40 backdrop-blur-sm flex items-center justify-center"
-            style={{ boxShadow: '0 0 30px rgba(34,211,238,0.3)' }}>
-            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+      {/* Live badge + sound toggle for video items */}
+      {hasVideo && (
+        <>
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/15">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-white text-[9px] font-bold uppercase tracking-widest">Live</span>
           </div>
-        </div>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); toggleSound(); }}
+            aria-label={muted ? 'Unmute video' : 'Mute video'}
+            className="absolute bottom-4 right-4 z-10 w-10 h-10 rounded-full border-2 border-white/60 bg-black/45 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-cyan-400"
+            style={{ boxShadow: '0 0 24px rgba(34,211,238,0.3)' }}
+          >
+            {muted
+              ? <VolumeX className="w-4 h-4 text-white" />
+              : <Volume2 className="w-4 h-4 text-cyan-300" />}
+          </button>
+        </>
       )}
 
       {/* Corner bracket */}
