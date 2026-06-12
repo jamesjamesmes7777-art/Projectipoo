@@ -12,6 +12,15 @@ function toTitleCase(s: string) {
   return s.replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function sharesFontSize(shares: number): number {
+  const digits = String(Math.round(shares)).length;
+  if (digits <= 2) return 168;
+  if (digits === 3) return 148;
+  if (digits === 4) return 118;
+  if (digits === 5) return 92;
+  return 72;
+}
+
 interface Props {
   cert: Certificate;
   qrDataUrl?: string;
@@ -225,10 +234,10 @@ const CertificateView = forwardRef<HTMLDivElement, Props>(({ cert, qrDataUrl, la
                 {t.sharesHeld}
               </p>
               <p style={{
-                fontSize: 168, fontWeight: 900, fontStyle: 'italic',
+                fontSize: sharesFontSize(cert.shares), fontWeight: 900, fontStyle: 'italic',
                 lineHeight: 0.9, color: 'rgba(50,230,255,1)',
                 textShadow: '0 0 50px rgba(50,230,255,0.7), 0 0 100px rgba(50,230,255,0.32)',
-                letterSpacing: '-6px', margin: 0,
+                letterSpacing: '-4px', margin: 0,
               }}>
                 {cert.shares}
               </p>
