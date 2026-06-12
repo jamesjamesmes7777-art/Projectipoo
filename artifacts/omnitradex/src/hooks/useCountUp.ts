@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useCountUp(target: number, duration = 1400, startDelay = 200): number {
   const [value, setValue] = useState(0);
+  const fromRef = useRef(0);
 
   useEffect(() => {
+    if (target === 0) {
+      setValue(0);
+      fromRef.current = 0;
+      return;
+    }
+
+    const from = fromRef.current;
     let start: number | null = null;
     let rafId: number;
 
@@ -12,11 +20,13 @@ export function useCountUp(target: number, duration = 1400, startDelay = 200): n
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
         const progress = Math.min(elapsed / duration, 1);
-        // Ease-out cubic
         const eased = 1 - Math.pow(1 - progress, 3);
-        setValue(Math.round(target * eased));
+        const next = Math.round(from + (target - from) * eased);
+        setValue(next);
         if (progress < 1) {
           rafId = requestAnimationFrame(step);
+        } else {
+          fromRef.current = target;
         }
       }
       rafId = requestAnimationFrame(step);

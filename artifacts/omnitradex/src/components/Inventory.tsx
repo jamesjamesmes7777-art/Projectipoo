@@ -142,13 +142,14 @@ export default function Inventory() {
             delay={0}
             fmtNum={fmtNum}
           />
-          <StaticCard
+          <AnimatedCard
             label={t.inventory.alloc_shares}
-            value={fmtNum(allocated)}
+            target={allocated}
             suffix={`${allocatedPct}% ${t.inventory.p_allocated.toLowerCase()}`}
             accent="text-emerald-400"
             icon={<TrendingUp className="w-3.5 h-3.5" />}
             delay={100}
+            fmtNum={fmtNum}
           />
           <AnimatedCard
             label={t.inventory.avail_shares}
@@ -159,13 +160,14 @@ export default function Inventory() {
             delay={200}
             fmtNum={fmtNum}
           />
-          <StaticCard
+          <AnimatedCard
             label={t.inventory.active_inv}
-            value={fmtNum(investors)}
+            target={investors}
             suffix={t.inventory.institutional_buyers}
             accent="text-emerald-400"
             icon={<Users className="w-3.5 h-3.5" />}
             delay={300}
+            fmtNum={fmtNum}
           />
         </div>
 
