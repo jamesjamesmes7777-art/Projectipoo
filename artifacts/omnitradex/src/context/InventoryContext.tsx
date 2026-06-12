@@ -1,10 +1,44 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 
 const TOTAL = 12_820_512;
-const INITIAL_PCT = 55.3;
-const INITIAL_ALLOCATED = Math.round(TOTAL * INITIAL_PCT / 100);
+const INITIAL_ALLOCATED = Math.round(TOTAL * 0.6162); // ~7,900,219
 const INITIAL_INVESTORS = 7_243;
 const TICK_MS = 30_000;
+const DEADLINE = new Date('2026-06-19T22:54:00').getTime(); // local time
+const LS_KEY = 'otx_inventory_v2'; // v2 clears any old persisted baseline
+
+interface Persisted { allocated: number; investors: number }
+
+function load(): Persisted {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw) as Persisted;
+      if (
+        typeof p.allocated === 'number' && typeof p.investors === 'number' &&
+        p.allocated >= INITIAL_ALLOCATED && p.allocated <= TOTAL &&
+        p.investors >= INITIAL_INVESTORS
+      ) return p;
+    }
+  } catch { /* ignore */ }
+  return { allocated: INITIAL_ALLOCATED, investors: INITIAL_INVESTORS };
+}
+
+function persist(allocated: number, investors: number) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify({ allocated, investors })); } catch { /* ignore */ }
+}
+
+/** Per-tick drift sized so allocated reaches TOTAL exactly by the deadline. */
+function tickDrift(currentAllocated: number): number {
+  const now = Date.now();
+  const msLeft = DEADLINE - now;
+  if (msLeft <= 0) return TOTAL - currentAllocated;
+  const remaining = TOTAL - currentAllocated;
+  if (remaining <= 0) return 0;
+  const ticksLeft = Math.max(1, msLeft / TICK_MS);
+  const jitter = 1 + (Math.random() * 0.3 - 0.15); // ±15 %
+  return Math.max(1, Math.round((remaining / ticksLeft) * jitter));
+}
 
 export interface InventoryState {
   total: number;
@@ -18,17 +52,22 @@ export interface InventoryState {
 const InventoryContext = createContext<InventoryState | null>(null);
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
-  const [allocated, setAllocated] = useState(INITIAL_ALLOCATED);
-  const [investors, setInvestors] = useState(INITIAL_INVESTORS);
-  const allocatedRef = useRef(INITIAL_ALLOCATED);
+  const init = load();
+  const [allocated, setAllocated] = useState(init.allocated);
+  const [investors, setInvestors] = useState(init.investors);
+  const allocatedRef = useRef(init.allocated);
+  const investorsRef = useRef(init.investors);
 
   useEffect(() => {
     const id = setInterval(() => {
-      const drift = Math.floor(80 + Math.random() * 220);
-      const next = Math.min(allocatedRef.current + drift, TOTAL);
-      allocatedRef.current = next;
-      setAllocated(next);
-      setInvestors(prev => prev + Math.floor(Math.random() * 2) + 1);
+      const drift = tickDrift(allocatedRef.current);
+      const nextAlloc = Math.min(allocatedRef.current + drift, TOTAL);
+      const nextInv = investorsRef.current + Math.floor(Math.random() * 2) + 1;
+      allocatedRef.current = nextAlloc;
+      investorsRef.current = nextInv;
+      setAllocated(nextAlloc);
+      setInvestors(nextInv);
+      persist(nextAlloc, nextInv);
     }, TICK_MS);
     return () => clearInterval(id);
   }, []);
@@ -37,9 +76,15 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     setAllocated(prev => {
       const next = Math.min(prev + shares, TOTAL);
       allocatedRef.current = next;
+      persist(next, investorsRef.current);
       return next;
     });
-    setInvestors(prev => prev + 1);
+    setInvestors(prev => {
+      const next = prev + 1;
+      investorsRef.current = next;
+      persist(allocatedRef.current, next);
+      return next;
+    });
   }, []);
 
   const available = TOTAL - allocated;
