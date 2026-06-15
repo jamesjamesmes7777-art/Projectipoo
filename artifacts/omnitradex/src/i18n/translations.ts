@@ -130,6 +130,52 @@ export interface T {
     col_premium: string;
     copy_id: string;
     copied: string;
+    refreshing: string;
+    next_update: string;
+  };
+  stock: {
+    loading: string;
+    bid: string;
+    ask: string;
+    day_low: string;
+    day_high: string;
+    prev_close: string;
+    candles: string;
+    periods: string;
+    live_market: string;
+    updated: string;
+  };
+  gallery: {
+    section_label: string;
+    title_1: string;
+    title_highlight: string;
+    subtitle: string;
+    watch: string;
+    ipo_target: string;
+    allocation_open: string;
+    ach_launches: string;
+    ach_satellites: string;
+    ach_success: string;
+    ach_valuation: string;
+    ach_reflights: string;
+    ach_launchpads: string;
+    cards: { title: string; sub: string }[];
+  };
+  verify: {
+    back: string;
+    header_title: string;
+    badge: string;
+    title: string;
+    subtitle: string;
+    placeholder: string;
+    btn_verify: string;
+    searching: string;
+    notfound_title: string;
+    notfound_body: string;
+    verified: string;
+    download_pdf: string;
+    exporting: string;
+    export_failed: string;
   };
   footer: {
     trust_title: string;
@@ -318,6 +364,59 @@ export const translations: Record<LangCode, T> = {
       col_premium: 'Premium',
       copy_id: 'Copy ID',
       copied: 'Copied!',
+      refreshing: 'Refreshing',
+      next_update: 'Next update',
+    },
+    stock: {
+      loading: 'Loading SPCX…',
+      bid: 'Bid',
+      ask: 'Ask',
+      day_low: 'Day Low',
+      day_high: 'Day High',
+      prev_close: 'Prev Close',
+      candles: '5-min candles',
+      periods: 'periods',
+      live_market: 'live market data',
+      updated: 'Updated',
+    },
+    gallery: {
+      section_label: 'SpaceX · Mission Portfolio',
+      title_1: 'The Archive of',
+      title_highlight: 'Human Ambition',
+      subtitle: "A decade of SpaceX innovation — from first flight to the world's most ambitious space program, now open for private investment.",
+      watch: 'Watch',
+      ipo_target: 'SpaceX IPO target:',
+      allocation_open: 'Allocation window open',
+      ach_launches: 'Falcon 9 Launches',
+      ach_satellites: 'Starlink Satellites',
+      ach_success: 'Mission Success',
+      ach_valuation: 'Estimated Valuation',
+      ach_reflights: 'Booster Reflights',
+      ach_launchpads: 'Active Launchpads',
+      cards: [
+        { title: 'Falcon 9 · Starlink Mission', sub: 'Official SpaceX webcast · watch on YouTube' },
+        { title: 'Deep Space Operations', sub: 'Starlink Mega-Constellation' },
+        { title: 'Earth from Orbit', sub: 'Dragon Crew · ISS Approach' },
+        { title: 'Crew Dragon Launch', sub: 'Crew-10 · LC-39A Kennedy' },
+        { title: 'Orbital Station', sub: 'Dragon Docking · 400km Altitude' },
+        { title: 'Starship · Flight Test', sub: 'Official SpaceX webcast · watch on YouTube' },
+      ],
+    },
+    verify: {
+      back: 'Back',
+      header_title: 'Certificate Verification',
+      badge: 'Secure Certificate Registry',
+      title: 'Verify Certificate',
+      subtitle: 'Enter a certificate reference number to verify its authenticity and view the full document.',
+      placeholder: 'e.g. OW-1602-3810',
+      btn_verify: 'Verify',
+      searching: 'Searching…',
+      notfound_title: 'Certificate Not Available',
+      notfound_body: 'No approved certificate found for reference {ref}. The certificate may not exist, is awaiting approval, or has been revoked.',
+      verified: 'Certificate Verified',
+      download_pdf: 'Download PDF',
+      exporting: 'Exporting…',
+      export_failed: 'Export failed. Please try again.',
     },
     footer: {
       trust_title: 'Institutional Trust & Custody —',
@@ -493,6 +592,59 @@ export const translations: Record<LangCode, T> = {
       col_premium: 'Ασφάλιστρο',
       copy_id: 'Αντιγραφή',
       copied: 'Αντιγράφηκε!',
+      refreshing: 'Ανανέωση',
+      next_update: 'Επόμενη ενημέρωση',
+    },
+    stock: {
+      loading: 'Φόρτωση SPCX…',
+      bid: 'Αγορά',
+      ask: 'Πώληση',
+      day_low: 'Ελάχιστο Ημέρας',
+      day_high: 'Μέγιστο Ημέρας',
+      prev_close: 'Προηγ. Κλείσιμο',
+      candles: 'Κεριά 5 λεπτών',
+      periods: 'περίοδοι',
+      live_market: 'ζωντανά δεδομένα αγοράς',
+      updated: 'Ενημερώθηκε',
+    },
+    gallery: {
+      section_label: 'SpaceX · Χαρτοφυλάκιο Αποστολών',
+      title_1: 'Το Αρχείο της',
+      title_highlight: 'Ανθρώπινης Φιλοδοξίας',
+      subtitle: 'Μια δεκαετία καινοτομίας της SpaceX — από την πρώτη πτήση έως το πιο φιλόδοξο διαστημικό πρόγραμμα στον κόσμο, τώρα ανοιχτό για ιδιωτικές επενδύσεις.',
+      watch: 'Δείτε',
+      ipo_target: 'Στόχος IPO της SpaceX:',
+      allocation_open: 'Παράθυρο κατανομής ανοιχτό',
+      ach_launches: 'Εκτοξεύσεις Falcon 9',
+      ach_satellites: 'Δορυφόροι Starlink',
+      ach_success: 'Επιτυχία Αποστολών',
+      ach_valuation: 'Εκτιμώμενη Αποτίμηση',
+      ach_reflights: 'Επαναπτήσεις Πυραύλων',
+      ach_launchpads: 'Ενεργές Εξέδρες',
+      cards: [
+        { title: 'Falcon 9 · Αποστολή Starlink', sub: 'Επίσημη μετάδοση SpaceX · δείτε στο YouTube' },
+        { title: 'Επιχειρήσεις Βαθέος Διαστήματος', sub: 'Μεγα-Σύμπλεγμα Starlink' },
+        { title: 'Η Γη από την Τροχιά', sub: 'Πλήρωμα Dragon · Προσέγγιση ISS' },
+        { title: 'Εκτόξευση Crew Dragon', sub: 'Crew-10 · LC-39A Kennedy' },
+        { title: 'Τροχιακός Σταθμός', sub: 'Σύνδεση Dragon · Υψόμετρο 400 χλμ.' },
+        { title: 'Starship · Δοκιμαστική Πτήση', sub: 'Επίσημη μετάδοση SpaceX · δείτε στο YouTube' },
+      ],
+    },
+    verify: {
+      back: 'Πίσω',
+      header_title: 'Επαλήθευση Πιστοποιητικού',
+      badge: 'Ασφαλές Μητρώο Πιστοποιητικών',
+      title: 'Επαλήθευση Πιστοποιητικού',
+      subtitle: 'Εισαγάγετε έναν αριθμό αναφοράς πιστοποιητικού για να επαληθεύσετε τη γνησιότητά του και να δείτε το πλήρες έγγραφο.',
+      placeholder: 'π.χ. OW-1602-3810',
+      btn_verify: 'Επαλήθευση',
+      searching: 'Αναζήτηση…',
+      notfound_title: 'Το Πιστοποιητικό Δεν Είναι Διαθέσιμο',
+      notfound_body: 'Δεν βρέθηκε εγκεκριμένο πιστοποιητικό για την αναφορά {ref}. Το πιστοποιητικό μπορεί να μην υπάρχει, να αναμένει έγκριση ή να έχει ανακληθεί.',
+      verified: 'Πιστοποιητικό Επαληθεύτηκε',
+      download_pdf: 'Λήψη PDF',
+      exporting: 'Εξαγωγή…',
+      export_failed: 'Η εξαγωγή απέτυχε. Δοκιμάστε ξανά.',
     },
     footer: {
       trust_title: 'Θεσμική Εμπιστοσύνη & Φύλαξη —',
@@ -668,6 +820,59 @@ export const translations: Record<LangCode, T> = {
       col_premium: 'Premio',
       copy_id: 'Copia ID',
       copied: 'Copiato!',
+      refreshing: 'Aggiornamento',
+      next_update: 'Prossimo aggiornamento',
+    },
+    stock: {
+      loading: 'Caricamento SPCX…',
+      bid: 'Acquisto',
+      ask: 'Vendita',
+      day_low: 'Minimo Giorno',
+      day_high: 'Massimo Giorno',
+      prev_close: 'Chiusura Prec.',
+      candles: 'Candele 5 min',
+      periods: 'periodi',
+      live_market: 'dati di mercato in tempo reale',
+      updated: 'Aggiornato',
+    },
+    gallery: {
+      section_label: 'SpaceX · Portfolio Missioni',
+      title_1: "L'Archivio dell'",
+      title_highlight: 'Ambizione Umana',
+      subtitle: 'Un decennio di innovazione SpaceX — dal primo volo al programma spaziale più ambizioso al mondo, ora aperto agli investimenti privati.',
+      watch: 'Guarda',
+      ipo_target: 'Obiettivo IPO SpaceX:',
+      allocation_open: 'Finestra di allocazione aperta',
+      ach_launches: 'Lanci Falcon 9',
+      ach_satellites: 'Satelliti Starlink',
+      ach_success: 'Successo Missioni',
+      ach_valuation: 'Valutazione Stimata',
+      ach_reflights: 'Riutilizzi Booster',
+      ach_launchpads: 'Rampe Attive',
+      cards: [
+        { title: 'Falcon 9 · Missione Starlink', sub: 'Webcast ufficiale SpaceX · guarda su YouTube' },
+        { title: 'Operazioni nello Spazio Profondo', sub: 'Mega-Costellazione Starlink' },
+        { title: "La Terra dall'Orbita", sub: 'Equipaggio Dragon · Avvicinamento ISS' },
+        { title: 'Lancio Crew Dragon', sub: 'Crew-10 · LC-39A Kennedy' },
+        { title: 'Stazione Orbitale', sub: 'Attracco Dragon · Altitudine 400 km' },
+        { title: 'Starship · Volo di Prova', sub: 'Webcast ufficiale SpaceX · guarda su YouTube' },
+      ],
+    },
+    verify: {
+      back: 'Indietro',
+      header_title: 'Verifica Certificato',
+      badge: 'Registro Sicuro dei Certificati',
+      title: 'Verifica Certificato',
+      subtitle: "Inserisci un numero di riferimento del certificato per verificarne l'autenticità e visualizzare il documento completo.",
+      placeholder: 'es. OW-1602-3810',
+      btn_verify: 'Verifica',
+      searching: 'Ricerca…',
+      notfound_title: 'Certificato Non Disponibile',
+      notfound_body: 'Nessun certificato approvato trovato per il riferimento {ref}. Il certificato potrebbe non esistere, essere in attesa di approvazione o essere stato revocato.',
+      verified: 'Certificato Verificato',
+      download_pdf: 'Scarica PDF',
+      exporting: 'Esportazione…',
+      export_failed: 'Esportazione non riuscita. Riprova.',
     },
     footer: {
       trust_title: 'Fiducia Istituzionale & Custodia —',
@@ -843,6 +1048,59 @@ export const translations: Record<LangCode, T> = {
       col_premium: 'Aufschlag',
       copy_id: 'Kopieren',
       copied: 'Kopiert!',
+      refreshing: 'Aktualisierung',
+      next_update: 'Nächste Aktualisierung',
+    },
+    stock: {
+      loading: 'SPCX wird geladen…',
+      bid: 'Kauf',
+      ask: 'Verkauf',
+      day_low: 'Tagestief',
+      day_high: 'Tageshoch',
+      prev_close: 'Vortagesschluss',
+      candles: '5-Min-Kerzen',
+      periods: 'Perioden',
+      live_market: 'Live-Marktdaten',
+      updated: 'Aktualisiert',
+    },
+    gallery: {
+      section_label: 'SpaceX · Missions-Portfolio',
+      title_1: 'Das Archiv des',
+      title_highlight: 'Menschlichen Ehrgeizes',
+      subtitle: 'Ein Jahrzehnt SpaceX-Innovation — vom ersten Flug bis zum ehrgeizigsten Raumfahrtprogramm der Welt, jetzt offen für private Investitionen.',
+      watch: 'Ansehen',
+      ipo_target: 'SpaceX-IPO-Ziel:',
+      allocation_open: 'Zuteilungsfenster geöffnet',
+      ach_launches: 'Falcon-9-Starts',
+      ach_satellites: 'Starlink-Satelliten',
+      ach_success: 'Missionserfolg',
+      ach_valuation: 'Geschätzte Bewertung',
+      ach_reflights: 'Booster-Wiederflüge',
+      ach_launchpads: 'Aktive Startrampen',
+      cards: [
+        { title: 'Falcon 9 · Starlink-Mission', sub: 'Offizieller SpaceX-Webcast · auf YouTube ansehen' },
+        { title: 'Weltraum-Operationen', sub: 'Starlink-Megakonstellation' },
+        { title: 'Die Erde aus dem Orbit', sub: 'Dragon-Crew · ISS-Anflug' },
+        { title: 'Crew-Dragon-Start', sub: 'Crew-10 · LC-39A Kennedy' },
+        { title: 'Orbitalstation', sub: 'Dragon-Andockung · 400 km Höhe' },
+        { title: 'Starship · Testflug', sub: 'Offizieller SpaceX-Webcast · auf YouTube ansehen' },
+      ],
+    },
+    verify: {
+      back: 'Zurück',
+      header_title: 'Zertifikatsprüfung',
+      badge: 'Sicheres Zertifikatsregister',
+      title: 'Zertifikat Prüfen',
+      subtitle: 'Geben Sie eine Zertifikatsreferenznummer ein, um die Echtheit zu prüfen und das vollständige Dokument anzuzeigen.',
+      placeholder: 'z. B. OW-1602-3810',
+      btn_verify: 'Prüfen',
+      searching: 'Suche…',
+      notfound_title: 'Zertifikat Nicht Verfügbar',
+      notfound_body: 'Kein genehmigtes Zertifikat für die Referenz {ref} gefunden. Das Zertifikat existiert möglicherweise nicht, wartet auf Genehmigung oder wurde widerrufen.',
+      verified: 'Zertifikat Verifiziert',
+      download_pdf: 'PDF Herunterladen',
+      exporting: 'Export…',
+      export_failed: 'Export fehlgeschlagen. Bitte erneut versuchen.',
     },
     footer: {
       trust_title: 'Institutionelles Vertrauen & Verwahrung —',
@@ -1018,6 +1276,59 @@ export const translations: Record<LangCode, T> = {
       col_premium: 'Prima',
       copy_id: 'Copiar ID',
       copied: 'Copiado!',
+      refreshing: 'Actualizando',
+      next_update: 'Próxima actualización',
+    },
+    stock: {
+      loading: 'Cargando SPCX…',
+      bid: 'Compra',
+      ask: 'Venta',
+      day_low: 'Mínimo del Día',
+      day_high: 'Máximo del Día',
+      prev_close: 'Cierre Ant.',
+      candles: 'Velas de 5 min',
+      periods: 'períodos',
+      live_market: 'datos de mercado en vivo',
+      updated: 'Actualizado',
+    },
+    gallery: {
+      section_label: 'SpaceX · Portafolio de Misiones',
+      title_1: 'El Archivo de la',
+      title_highlight: 'Ambición Humana',
+      subtitle: 'Una década de innovación de SpaceX — desde el primer vuelo hasta el programa espacial más ambicioso del mundo, ahora abierto a la inversión privada.',
+      watch: 'Ver',
+      ipo_target: 'Objetivo de la IPO de SpaceX:',
+      allocation_open: 'Ventana de asignación abierta',
+      ach_launches: 'Lanzamientos Falcon 9',
+      ach_satellites: 'Satélites Starlink',
+      ach_success: 'Éxito de Misiones',
+      ach_valuation: 'Valoración Estimada',
+      ach_reflights: 'Revuelos de Propulsores',
+      ach_launchpads: 'Plataformas Activas',
+      cards: [
+        { title: 'Falcon 9 · Misión Starlink', sub: 'Transmisión oficial de SpaceX · ver en YouTube' },
+        { title: 'Operaciones en el Espacio Profundo', sub: 'Megaconstelación Starlink' },
+        { title: 'La Tierra desde la Órbita', sub: 'Tripulación Dragon · Aproximación a la ISS' },
+        { title: 'Lanzamiento Crew Dragon', sub: 'Crew-10 · LC-39A Kennedy' },
+        { title: 'Estación Orbital', sub: 'Acoplamiento Dragon · Altitud 400 km' },
+        { title: 'Starship · Vuelo de Prueba', sub: 'Transmisión oficial de SpaceX · ver en YouTube' },
+      ],
+    },
+    verify: {
+      back: 'Atrás',
+      header_title: 'Verificación de Certificado',
+      badge: 'Registro Seguro de Certificados',
+      title: 'Verificar Certificado',
+      subtitle: 'Introduzca un número de referencia de certificado para verificar su autenticidad y ver el documento completo.',
+      placeholder: 'ej. OW-1602-3810',
+      btn_verify: 'Verificar',
+      searching: 'Buscando…',
+      notfound_title: 'Certificado No Disponible',
+      notfound_body: 'No se encontró ningún certificado aprobado para la referencia {ref}. El certificado puede no existir, estar pendiente de aprobación o haber sido revocado.',
+      verified: 'Certificado Verificado',
+      download_pdf: 'Descargar PDF',
+      exporting: 'Exportando…',
+      export_failed: 'Error al exportar. Inténtelo de nuevo.',
     },
     footer: {
       trust_title: 'Confianza Institucional & Custodia —',

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ExternalLink, Play } from 'lucide-react';
+import { useLang } from '../context/LangContext';
 import falconNight from '../assets/spacex/real-falcon9-night.jpg';
 import falconDay from '../assets/spacex/real-falcon9-day.jpg';
 import dragonEarth from '../assets/spacex/real-dragon-earth.jpg';
@@ -11,53 +12,44 @@ const GALLERY = [
   {
     img: falconNight,
     videoUrl: 'https://www.youtube.com/watch?v=84Nct_Q9Lqw',
-    title: 'Falcon 9 · Starlink Mission',
-    sub: 'Official SpaceX webcast · watch on YouTube',
     span: 'col-span-2 row-span-2',
   },
   {
     img: falconDay,
     link: 'https://www.starlink.com/',
-    title: 'Deep Space Operations',
-    sub: 'Starlink Mega-Constellation',
     span: 'col-span-1 row-span-1',
   },
   {
     img: dragonEarth,
     link: 'https://www.spacex.com/vehicles/dragon/',
-    title: 'Earth from Orbit',
-    sub: 'Dragon Crew · ISS Approach',
     span: 'col-span-1 row-span-1',
   },
   {
     img: crewLaunch,
     link: 'https://www.spacex.com/launches/mission/?missionId=crew-10',
-    title: 'Crew Dragon Launch',
-    sub: 'Crew-10 · LC-39A Kennedy',
     span: 'col-span-1 row-span-1',
   },
   {
     img: dragonDocking,
     link: 'https://www.spacex.com/vehicles/dragon/',
-    title: 'Orbital Station',
-    sub: 'Dragon Docking · 400km Altitude',
     span: 'col-span-1 row-span-1',
   },
   {
     img: starshipImg,
     videoUrl: 'https://www.youtube.com/watch?v=CMGiNKcVSek',
-    title: 'Starship · Flight Test',
-    sub: 'Official SpaceX webcast · watch on YouTube',
     span: 'col-span-2 row-span-1',
   },
 ] as const;
 
 interface GalleryCardProps {
   item: typeof GALLERY[number];
+  caption?: { title: string; sub: string };
   index: number;
 }
 
-function GalleryCard({ item, index }: GalleryCardProps) {
+function GalleryCard({ item, caption: rawCaption, index }: GalleryCardProps) {
+  const caption = rawCaption ?? { title: '', sub: '' };
+  const { watch } = useLang().t.gallery;
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -88,7 +80,7 @@ function GalleryCard({ item, index }: GalleryCardProps) {
       {/* Photo (real SpaceX imagery / video poster) */}
       <img
         src={item.img}
-        alt={item.title}
+        alt={caption.title}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
           transform: hovered ? 'scale(1.07)' : 'scale(1.02)',
@@ -139,13 +131,13 @@ function GalleryCard({ item, index }: GalleryCardProps) {
           </div>
           <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/80 backdrop-blur-sm border border-white/15">
             <Play className="w-2.5 h-2.5 text-white" fill="currentColor" />
-            <span className="text-white text-[9px] font-bold uppercase tracking-widest">Watch</span>
+            <span className="text-white text-[9px] font-bold uppercase tracking-widest">{watch}</span>
           </div>
           <a
             href={videoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Watch ${item.title} on YouTube`}
+            aria-label={`${watch} ${caption.title} · YouTube`}
             className="absolute inset-0 z-20 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           />
         </>
@@ -157,7 +149,7 @@ function GalleryCard({ item, index }: GalleryCardProps) {
           href={link}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`View ${item.title} on SpaceX`}
+          aria-label={`${caption.title} · SpaceX`}
           className="absolute inset-0 z-20 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         />
       )}
@@ -172,24 +164,27 @@ function GalleryCard({ item, index }: GalleryCardProps) {
         className="absolute bottom-0 left-0 right-0 p-4 transition-transform duration-400"
         style={{ transform: hovered ? 'translateY(0)' : 'translateY(4px)' }}
       >
-        <p className="text-white font-bold text-sm leading-tight mb-1">{item.title}</p>
-        <p className="text-slate-400 text-xs font-medium">{item.sub}</p>
+        <p className="text-white font-bold text-sm leading-tight mb-1">{caption.title}</p>
+        <p className="text-slate-400 text-xs font-medium">{caption.sub}</p>
       </div>
     </div>
   );
 }
 
 /* ── Mission achievement strip ─────────────────────────────────────────────── */
-const ACHIEVEMENTS = [
-  { num: '350+', label: 'Falcon 9 Launches' },
-  { num: '6,800+', label: 'Starlink Satellites' },
-  { num: '99.2%', label: 'Mission Success' },
-  { num: '$350B+', label: 'Estimated Valuation' },
-  { num: '30+', label: 'Booster Reflights' },
-  { num: '2', label: 'Active Launchpads' },
-];
+const ACH_NUMS = ['350+', '6,800+', '99.2%', '$350B+', '30+', '2'];
 
 function AchievementStrip() {
+  const { gallery } = useLang().t;
+  const labels = [
+    gallery.ach_launches,
+    gallery.ach_satellites,
+    gallery.ach_success,
+    gallery.ach_valuation,
+    gallery.ach_reflights,
+    gallery.ach_launchpads,
+  ];
+  const achievements = ACH_NUMS.map((num, i) => ({ num, label: labels[i] }));
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -211,7 +206,7 @@ function AchievementStrip() {
         transition: 'opacity 0.6s ease, transform 0.6s ease',
       }}
     >
-      {ACHIEVEMENTS.map((a, i) => (
+      {achievements.map((a, i) => (
         <div key={i} className="bg-black/80 px-4 py-5 text-center hover:bg-slate-900/80 transition-colors">
           <p className="text-cyan-400 font-black text-xl sm:text-2xl tabular-nums tracking-tight">{a.num}</p>
           <p className="text-slate-600 text-[10px] uppercase tracking-widest mt-1 font-semibold">{a.label}</p>
@@ -222,6 +217,7 @@ function AchievementStrip() {
 }
 
 export default function SpaceXGallery() {
+  const { gallery } = useLang().t;
   return (
     <section className="py-20 bg-black relative overflow-hidden">
       {/* Background effects */}
@@ -235,13 +231,13 @@ export default function SpaceXGallery() {
 
         {/* Section header */}
         <div className="text-center mb-12">
-          <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">SpaceX · Mission Portfolio</p>
+          <p className="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-3">{gallery.section_label}</p>
           <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">
-            The Archive of{' '}
-            <span className="text-gradient-cyan">Human Ambition</span>
+            {gallery.title_1}{' '}
+            <span className="text-gradient-cyan">{gallery.title_highlight}</span>
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto text-base leading-relaxed">
-            A decade of SpaceX innovation — from first flight to the world's most ambitious space program, now open for private investment.
+            {gallery.subtitle}
           </p>
         </div>
 
@@ -251,7 +247,7 @@ export default function SpaceXGallery() {
         {/* Photo grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 auto-rows-[200px]">
           {GALLERY.map((item, i) => (
-            <GalleryCard key={i} item={item} index={i} />
+            <GalleryCard key={i} item={item} caption={gallery.cards[i]} index={i} />
           ))}
         </div>
 
@@ -259,10 +255,10 @@ export default function SpaceXGallery() {
         <div className="mt-10 flex items-center justify-center">
           <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-black/60 border border-slate-800/80 backdrop-blur-md text-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-400">SpaceX IPO target:</span>
+            <span className="text-slate-400">{gallery.ipo_target}</span>
             <span className="text-white font-bold">Q4 2026</span>
             <span className="text-slate-700 mx-1">·</span>
-            <span className="text-cyan-400 font-semibold">Allocation window open</span>
+            <span className="text-cyan-400 font-semibold">{gallery.allocation_open}</span>
           </div>
         </div>
       </div>

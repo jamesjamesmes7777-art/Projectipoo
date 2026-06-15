@@ -41,11 +41,25 @@ function rng(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const PRICE_MIN = 168;
+const PRICE_MAX = 316;
+
+function makeBid(price: number, usedIds: Set<string>, cityIdx: number): Bid {
+  let id: string;
+  do { id = `BID-${rng(1000, 9999)}`; } while (usedIds.has(id));
+  usedIds.add(id);
+  const [city, cc] = CITIES[cityIdx];
+  const shares = SHARE_LOTS[rng(0, SHARE_LOTS.length - 1)];
+  const premiumVal = parseFloat(((price / BASE_PRICE - 1) * 100).toFixed(1));
+  const premium = `+${premiumVal.toFixed(1)}%`;
+  return { id, region: `${city}, ${cc}`, shares, bid: price, premium, premiumVal };
+}
+
 function generateBids(): Bid[] {
   const count = rng(38, 52);
   const priceSet = new Set<number>();
   while (priceSet.size < count) {
-    priceSet.add(rng(120, 285));
+    priceSet.add(rng(PRICE_MIN, PRICE_MAX));
   }
   const prices = [...priceSet].sort((a, b) => b - a);
 
@@ -53,10 +67,6 @@ function generateBids(): Bid[] {
   const usedCityIdxs: number[] = [];
 
   return prices.map(price => {
-    let id: string;
-    do { id = `BID-${rng(1000, 9999)}`; } while (usedIds.has(id));
-    usedIds.add(id);
-
     // Prefer not repeating cities until we run out
     let cityIdx: number;
     if (usedCityIdxs.length < CITIES.length) {
@@ -65,14 +75,43 @@ function generateBids(): Bid[] {
       cityIdx = rng(0, CITIES.length - 1);
     }
     usedCityIdxs.push(cityIdx);
-    const [city, cc] = CITIES[cityIdx];
-
-    const shares = SHARE_LOTS[rng(0, SHARE_LOTS.length - 1)];
-    const premiumVal = parseFloat(((price / BASE_PRICE - 1) * 100).toFixed(1));
-    const premium = `+${premiumVal.toFixed(1)}%`;
-
-    return { id, region: `${city}, ${cc}`, shares, bid: price, premium, premiumVal };
+    return makeBid(price, usedIds, cityIdx);
   });
+}
+
+/* ── Partial refresh: keep most bids, regenerate a minority ──────────────────── */
+function partialRefresh(prev: RowState[]): RowState[] {
+  if (prev.length === 0) return toRows(generateBids(), true);
+
+  // Shuffle indices, keep ~65% of existing bids unchanged ("staying" bids)
+  const idxs = prev.map((_, i) => i);
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = rng(0, i);
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  const keepCount = Math.max(8, Math.floor(prev.length * 0.65));
+  const keepSet = new Set(idxs.slice(0, keepCount));
+
+  const kept: RowState[] = prev
+    .filter((_, i) => keepSet.has(i))
+    .map(r => ({ bid: r.bid, flashing: false, movement: null, entering: false }));
+
+  const replaceCount = prev.length - kept.length;
+  const usedPrices = new Set(kept.map(r => r.bid.bid));
+  const usedIds = new Set(kept.map(r => r.bid.id));
+
+  const fresh: RowState[] = [];
+  let guard = 0;
+  while (fresh.length < replaceCount && guard < 1000) {
+    guard++;
+    const price = rng(PRICE_MIN, PRICE_MAX);
+    if (usedPrices.has(price)) continue;
+    usedPrices.add(price);
+    const cityIdx = rng(0, CITIES.length - 1);
+    fresh.push({ bid: makeBid(price, usedIds, cityIdx), flashing: false, movement: null, entering: true });
+  }
+
+  return [...kept, ...fresh].sort((a, b) => b.bid.bid - a.bid.bid);
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
@@ -143,7 +182,6 @@ export default function DemandBoard() {
   const [rows, setRows] = useState<RowState[]>(() => toRows(generateBids()));
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshCount, setRefreshCount] = useState(0);
 
   const flashTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const shiftTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -151,17 +189,35 @@ export default function DemandBoard() {
   const totalShares = rows.reduce((s, r) => s + r.bid.shares, 0);
   const totalCommitted = rows.reduce((s, r) => s + r.bid.shares * r.bid.bid, 0);
 
-  /* micro-flash random rows */
+  /* live tick: flash a few rows, and nudge some prices for a real-time feel */
   const scheduleFlash = useCallback(() => {
     flashTimer.current = setTimeout(() => {
-      const count = rng(1, 3);
-      const indices = new Set<number>();
-      while (indices.size < count) indices.add(rng(0, rows.length - 1));
-      setRows(prev => prev.map((r, i) => indices.has(i) ? { ...r, flashing: true } : r));
+      const nudge = Math.random() < 0.6;
+      setRows(prev => {
+        if (prev.length === 0) return prev;
+        const count = Math.min(rng(1, 3), prev.length);
+        const indices = new Set<number>();
+        while (indices.size < count) indices.add(rng(0, prev.length - 1));
+        let next = prev.map((r, i) => {
+          if (!indices.has(i)) return r;
+          if (!nudge) return { ...r, flashing: true };
+          const delta = rng(-3, 3);
+          const np = Math.min(PRICE_MAX, Math.max(PRICE_MIN, r.bid.bid + delta));
+          const premiumVal = parseFloat(((np / BASE_PRICE - 1) * 100).toFixed(1));
+          return {
+            ...r,
+            flashing: true,
+            movement: (np > r.bid.bid ? 'up' : np < r.bid.bid ? 'down' : null) as 'up' | 'down' | null,
+            bid: { ...r.bid, bid: np, premiumVal, premium: `+${premiumVal.toFixed(1)}%` },
+          };
+        });
+        if (nudge) next = [...next].sort((a, b) => b.bid.bid - a.bid.bid);
+        return next;
+      });
       setTimeout(() => setRows(prev => prev.map(r => ({ ...r, flashing: false, movement: null }))), 1600);
       scheduleFlash();
     }, rng(4000, 8000));
-  }, [rows.length]);
+  }, []);
 
   /* micro-shift swap adjacent rows */
   const scheduleShift = useCallback(() => {
@@ -194,9 +250,8 @@ export default function DemandBoard() {
           // Trigger refresh
           setRefreshing(true);
           setTimeout(() => {
-            const newBids = generateBids();
-            setRows(toRows(newBids, true));
-            setRefreshCount(c => c + 1);
+            // Keep most bids, regenerate a minority — re-sorted by price
+            setRows(prev => partialRefresh(prev));
             // Remove entering flag after animation completes
             setTimeout(() => setRows(prev => prev.map(r => ({ ...r, entering: false }))), 800);
             setRefreshing(false);
@@ -261,13 +316,13 @@ export default function DemandBoard() {
               {refreshing && (
                 <div className="flex items-center gap-1.5 text-xs text-cyan-400">
                   <RefreshCw className="w-3 h-3 animate-spin" />
-                  <span className="font-semibold uppercase tracking-widest text-[10px]">Refreshing</span>
+                  <span className="font-semibold uppercase tracking-widest text-[10px]">{t.demand.refreshing}</span>
                 </div>
               )}
               {!refreshing && (
                 <div className="flex items-center gap-2">
                   <span className="text-slate-600 text-[10px] uppercase tracking-widest font-semibold hidden sm:block">
-                    Next update
+                    {t.demand.next_update}
                   </span>
                   <CountdownRing seconds={countdown} total={REFRESH_INTERVAL} />
                 </div>
@@ -299,7 +354,7 @@ export default function DemandBoard() {
                   const { text: premText, badge: premBadge } = getPremiumColor(bid.premiumVal);
                   return (
                     <tr
-                      key={`${refreshCount}-${bid.id}`}
+                      key={bid.id}
                       className={`border-b border-slate-800/25 hover:bg-slate-800/15 transition-all ${flashing ? 'row-active' : ''} ${i % 2 !== 0 ? 'bg-slate-900/8' : ''}`}
                       style={{
                         transform: movement === 'up'

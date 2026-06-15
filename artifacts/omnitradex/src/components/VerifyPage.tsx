@@ -1,12 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Fragment } from 'react';
 import { Search, AlertCircle, Download, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useRoute, Link } from 'wouter';
 import CertificateView from './CertificateView';
 import { getCertificateByRef } from '../lib/certificates';
 import { generateQRDataUrl, exportCertificatePDF } from '../lib/pdfExport';
+import { useLang, type LangCode } from '../context/LangContext';
 import type { Certificate } from '../lib/types';
 
+const LANGS: LangCode[] = ['en', 'el', 'it', 'de', 'es'];
+
 export default function VerifyPage() {
+  const { t, lang, setLang } = useLang();
   const [, params] = useRoute('/verify/:ref');
   const [input, setInput] = useState(params?.ref ?? '');
   const [cert, setCert] = useState<Certificate | null>(null);
@@ -46,7 +50,7 @@ export default function VerifyPage() {
     try {
       await exportCertificatePDF(certRef.current, `certificate-${cert.reference_number}.pdf`);
     } catch (err) {
-      setExportError(err instanceof Error ? err.message : 'Export failed. Please try again.');
+      setExportError(err instanceof Error ? err.message : t.verify.export_failed);
     } finally {
       setExporting(false);
     }
@@ -59,13 +63,30 @@ export default function VerifyPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm">
             <ArrowLeft className="w-4 h-4" />
-            Back
+            {t.verify.back}
           </Link>
           <div className="flex items-center gap-3 ml-4">
             <div className="w-7 h-7 rounded-md bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
               <span className="text-white font-black text-[10px]">OTX</span>
             </div>
-            <span className="text-white font-bold text-sm tracking-tight">Certificate Verification</span>
+            <span className="text-white font-bold text-sm tracking-tight">{t.verify.header_title}</span>
+          </div>
+
+          {/* Language toggle */}
+          <div className="ml-auto flex items-center gap-0.5 p-0.5 sm:p-1 rounded-lg bg-slate-900/80 border border-slate-800/60">
+            {LANGS.map(code => (
+              <button
+                key={code}
+                onClick={() => setLang(code)}
+                className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition-all duration-150 ${
+                  lang === code
+                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {code}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -75,11 +96,11 @@ export default function VerifyPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/25 bg-cyan-500/5 text-cyan-400 text-xs font-semibold tracking-widest uppercase mb-6">
             <CheckCircle className="w-3.5 h-3.5" />
-            Secure Certificate Registry
+            {t.verify.badge}
           </div>
-          <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Verify Certificate</h1>
+          <h1 className="text-4xl font-black text-white mb-4 tracking-tight">{t.verify.title}</h1>
           <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-            Enter a certificate reference number to verify its authenticity and view the full document.
+            {t.verify.subtitle}
           </p>
         </div>
 
@@ -92,7 +113,7 @@ export default function VerifyPage() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && runSearch(input)}
-                placeholder="e.g. OW-1602-3810"
+                placeholder={t.verify.placeholder}
                 className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/60 text-white placeholder-slate-600 text-sm focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
               />
             </div>
@@ -101,7 +122,7 @@ export default function VerifyPage() {
               disabled={status === 'loading'}
               className="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm transition-all disabled:opacity-50 whitespace-nowrap"
             >
-              {status === 'loading' ? 'Searching…' : 'Verify'}
+              {status === 'loading' ? t.verify.searching : t.verify.btn_verify}
             </button>
           </div>
         </div>
@@ -110,10 +131,14 @@ export default function VerifyPage() {
         {status === 'notfound' && (
           <div className="max-w-md mx-auto rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center">
             <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-4" />
-            <h3 className="text-white font-bold text-lg mb-2">Certificate Not Available</h3>
+            <h3 className="text-white font-bold text-lg mb-2">{t.verify.notfound_title}</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              No approved certificate found for reference <strong className="text-white">{input}</strong>.
-              The certificate may not exist, is awaiting approval, or has been revoked.
+              {t.verify.notfound_body.split('{ref}').map((part, i) => (
+                <Fragment key={i}>
+                  {i > 0 && <strong className="text-white">{input}</strong>}
+                  {part}
+                </Fragment>
+              ))}
             </p>
           </div>
         )}
@@ -125,7 +150,7 @@ export default function VerifyPage() {
             <div className="flex items-center justify-center gap-3 mb-8 flex-wrap">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/8 text-emerald-400 text-sm font-semibold">
                 <CheckCircle className="w-4 h-4" />
-                Certificate Verified
+                {t.verify.verified}
               </div>
 
               <button
@@ -134,7 +159,7 @@ export default function VerifyPage() {
                 className="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-600 hover:border-cyan-500/40 text-slate-300 hover:text-white text-sm font-semibold transition-all disabled:opacity-50"
               >
                 <Download className="w-4 h-4" />
-                {exporting ? 'Exporting…' : 'Download PDF'}
+                {exporting ? t.verify.exporting : t.verify.download_pdf}
               </button>
             </div>
 
@@ -152,7 +177,7 @@ export default function VerifyPage() {
                 flexShrink: 0,
               }}>
                 <div style={{ transform: 'scale(0.75)', transformOrigin: 'top left', width: 793 }}>
-                  <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language="en" />
+                  <CertificateView ref={certRef} cert={cert} qrDataUrl={qrUrl} language={lang} />
                 </div>
               </div>
             </div>

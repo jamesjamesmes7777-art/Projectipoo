@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { useLang } from '../context/LangContext';
+import { getLocale } from '../i18n/translations';
 
 /* ── Types ───────────────────────────────────────────────── */
 interface Candle {
@@ -76,8 +78,8 @@ function fmt(n: number, d = 2) {
 const PL = 62, PR = 62, PT = 14, PB = 22;
 
 function CandleChart({
-  candles, livePrice, isUp,
-}: { candles: Candle[]; livePrice: number; isUp: boolean }) {
+  candles, livePrice, isUp, locale,
+}: { candles: Candle[]; livePrice: number; isUp: boolean; locale: string }) {
   const wrapRef  = useRef<HTMLDivElement>(null);
   const [svgW, setSvgW] = useState(900);
   const PRICE_H = 272;
@@ -209,7 +211,7 @@ function CandleChart({
         {candles.map((c, i) => {
           if (i % Math.max(1, Math.floor(n / 6)) !== 0) return null;
           const t = new Date(c.time);
-          const lbl = t.toLocaleTimeString('en-US',
+          const lbl = t.toLocaleTimeString(locale,
             { hour: '2-digit', minute: '2-digit', hour12: false });
           return (
             <text key={`xl${c.time}`}
@@ -237,6 +239,8 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 
 /* ── Main export ─────────────────────────────────────────── */
 export default function StockChart() {
+  const { t, lang } = useLang();
+  const locale = getLocale(lang);
   const [data,       setData]       = useState<StockData | null>(null);
   const [candles,    setCandles]    = useState<Candle[]>([]);
   const [realCandles, setRealCandles] = useState<Candle[]>([]);
@@ -300,7 +304,7 @@ export default function StockChart() {
       <div className="w-full bg-[#020408] border-y border-slate-800/50 py-8">
         <div className="max-w-7xl mx-auto px-4 flex items-center gap-3 text-slate-600 text-sm">
           <span className="w-2 h-2 rounded-full bg-slate-700 animate-pulse" />
-          Loading SPCX…
+          {t.stock.loading}
         </div>
       </div>
     );
@@ -374,39 +378,39 @@ export default function StockChart() {
             </div>
 
             <div className="hidden lg:grid grid-cols-1 gap-3 mt-5 pt-4 border-t border-slate-800/60">
-              <Stat label="Bid"        value={`$${fmt(data.bid)}`}       />
-              <Stat label="Ask"        value={`$${fmt(data.ask)}`}       />
-              <Stat label="Day Low"    value={`$${fmt(data.dayLow)}`}    />
-              <Stat label="Day High"   value={`$${fmt(data.dayHigh)}`}   />
-              <Stat label="Prev Close" value={`$${fmt(data.prevClose)}`} />
+              <Stat label={t.stock.bid}        value={`$${fmt(data.bid)}`}       />
+              <Stat label={t.stock.ask}        value={`$${fmt(data.ask)}`}       />
+              <Stat label={t.stock.day_low}    value={`$${fmt(data.dayLow)}`}    />
+              <Stat label={t.stock.day_high}   value={`$${fmt(data.dayHigh)}`}   />
+              <Stat label={t.stock.prev_close} value={`$${fmt(data.prevClose)}`} />
             </div>
           </div>
 
           {/* Chart */}
           <div className="flex-1 min-w-0 rounded-lg overflow-hidden border border-slate-800/60
                           bg-[#020810]">
-            <CandleChart candles={candles} livePrice={data.price} isUp={isUp} />
+            <CandleChart candles={candles} livePrice={data.price} isUp={isUp} locale={locale} />
           </div>
         </div>
 
         {/* ── Mobile stats ── */}
         <div className="lg:hidden mt-4 pt-4 border-t border-slate-800/60
                         grid grid-cols-3 sm:grid-cols-5 gap-4">
-          <Stat label="Bid"        value={`$${fmt(data.bid)}`}       />
-          <Stat label="Ask"        value={`$${fmt(data.ask)}`}       />
-          <Stat label="Day Low"    value={`$${fmt(data.dayLow)}`}    />
-          <Stat label="Day High"   value={`$${fmt(data.dayHigh)}`}   />
-          <Stat label="Prev Close" value={`$${fmt(data.prevClose)}`} />
+          <Stat label={t.stock.bid}        value={`$${fmt(data.bid)}`}       />
+          <Stat label={t.stock.ask}        value={`$${fmt(data.ask)}`}       />
+          <Stat label={t.stock.day_low}    value={`$${fmt(data.dayLow)}`}    />
+          <Stat label={t.stock.day_high}   value={`$${fmt(data.dayHigh)}`}   />
+          <Stat label={t.stock.prev_close} value={`$${fmt(data.prevClose)}`} />
         </div>
 
         {/* ── Footer ── */}
         <div className="mt-3 flex items-center justify-between text-[10px] text-slate-700">
           <span>
-            5-min candles · {candles.length} periods
-            {usingReal && <span className="ml-1.5 text-cyan-900">· live market data</span>}
+            {t.stock.candles} · {candles.length} {t.stock.periods}
+            {usingReal && <span className="ml-1.5 text-cyan-900">· {t.stock.live_market}</span>}
           </span>
           <span className="font-mono">
-            Updated {new Date(data.lastUpdated).toLocaleTimeString('en-US',
+            {t.stock.updated} {new Date(data.lastUpdated).toLocaleTimeString(locale,
               { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
         </div>
