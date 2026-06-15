@@ -2,26 +2,27 @@ import { Router, type IRouter, type Request, type Response } from "express";
 
 const router: IRouter = Router();
 
-const BASE_PRICE = 370.0;
-const PREV_CLOSE = 358.5;
+// Reference data from NASDAQ as of 2026-06-12 (IPO day)
+const PREV_CLOSE = 135.00;   // pre-IPO reference price
+const DAY_LOW    = 149.34;
+const DAY_HIGH   = 176.52;
+const IPO_CLOSE  = 160.95;   // first-day closing price
 
 function getStockPrice(now = Date.now()) {
   const t = now / 60_000; // minutes since epoch
-  // Two deterministic sine waves so the price moves realistically
-  const slowWave = Math.sin(t / 53.7) * 9.2;  // ~54-min cycle ±$9.2
-  const fastWave = Math.sin(t / 8.1) * 2.4;   // ~8-min cycle  ±$2.4
-  const microWave = Math.sin(t / 1.7) * 0.6;  // ~2-min cycle  ±$0.6
-  const price = +(BASE_PRICE + slowWave + fastWave + microWave).toFixed(2);
+  // Deterministic sine waves — same value for every visitor at the same time
+  const slowWave  = Math.sin(t / 47.3) * 6.8;   // ~47-min cycle ±$6.8
+  const fastWave  = Math.sin(t / 7.9)  * 2.1;   // ~8-min cycle  ±$2.1
+  const microWave = Math.sin(t / 1.8)  * 0.55;  // ~2-min cycle  ±$0.55
+  // Anchor oscillation around IPO close, clamped inside day range
+  const raw = IPO_CLOSE + slowWave + fastWave + microWave;
+  const price = +(Math.max(DAY_LOW + 1, Math.min(DAY_HIGH - 1, raw))).toFixed(2);
 
-  const change = +(price - PREV_CLOSE).toFixed(2);
+  const change    = +(price - PREV_CLOSE).toFixed(2);
   const changePct = +((change / PREV_CLOSE) * 100).toFixed(2);
-  const spread = 0.30;
-  const bid = +(price - spread / 2).toFixed(2);
-  const ask = +(price + spread / 2).toFixed(2);
-
-  // Daily range anchored to current price
-  const dayLow = +(price - 4.8 - Math.abs(slowWave) * 0.3).toFixed(2);
-  const dayHigh = +(price + 3.5 + Math.abs(slowWave) * 0.2).toFixed(2);
+  const spread    = 0.30;
+  const bid       = +(price - spread / 2).toFixed(2);
+  const ask       = +(price + spread / 2).toFixed(2);
 
   return {
     symbol: "SPCX",
@@ -32,9 +33,9 @@ function getStockPrice(now = Date.now()) {
     bid,
     ask,
     prevClose: PREV_CLOSE,
-    dayLow,
-    dayHigh,
-    market: "OTC Private Markets",
+    dayLow: DAY_LOW,
+    dayHigh: DAY_HIGH,
+    market: "NASDAQ",
     currency: "USD",
     lastUpdated: new Date(now).toISOString(),
   };
