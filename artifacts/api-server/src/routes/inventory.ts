@@ -4,8 +4,8 @@ const router: IRouter = Router();
 
 const TOTAL = 17_820_512; // original 12,820,512 + 5,000,000 additional acquisition
 const START_ALLOCATED = 7_900_219;
-const START_INVESTORS = 7_243;
-const DEADLINE_INVESTORS = 8_850;
+const START_INVESTORS = 13_000;
+const DEADLINE_INVESTORS = 15_500;
 
 // Fixed UTC timestamps — identical result on every server and every client
 const START_MS = new Date("2026-06-11T21:00:00Z").getTime(); // midnight UTC+3 on Jun 12
