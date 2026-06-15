@@ -310,7 +310,14 @@ export default function StockChart() {
                    style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)' }}>
                 ${fmt(data.price)}
               </div>
-              <div className="text-slate-500 text-xs font-mono mt-0.5 mb-3">USD</div>
+              <div className="flex items-center gap-2 mt-1 mb-3">
+                <span className="text-slate-500 text-xs font-mono">USD</span>
+                <span className="text-slate-700 text-xs">·</span>
+                <span className="text-slate-300 text-sm font-semibold tabular-nums">
+                  ≈ €{fmt(data.priceEur)}
+                </span>
+                <span className="text-slate-600 text-[10px]">EUR</span>
+              </div>
 
               <div className={`flex items-center gap-1.5 text-sm font-bold ${priceColor}`}>
                 <TrendIcon className="w-4 h-4" />
