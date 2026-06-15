@@ -14,11 +14,15 @@ interface Candle {
 interface StockData {
   symbol: string;
   price: number;
+  priceEur: number;
+  eurRate: number;
   change: number;
   changePct: number;
+  changeEur: number;
   bid: number;
   ask: number;
   prevClose: number;
+  prevCloseEur: number;
   dayLow: number;
   dayHigh: number;
   market: string;
