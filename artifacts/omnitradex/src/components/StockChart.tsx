@@ -38,6 +38,17 @@ const FB_HIGH   = 176.52;
 const INTERVAL  = 5 * 60_000;
 const N_FALLBACK = 40;
 
+/* ── Timeframes ──────────────────────────────────────────── */
+interface Timeframe { label: string; ms: number; n: number; }
+const TIMEFRAMES: Timeframe[] = [
+  { label: '1m',  ms: 60_000,           n: 48 },
+  { label: '5m',  ms: 5 * 60_000,       n: 40 },
+  { label: '15m', ms: 15 * 60_000,      n: 40 },
+  { label: '1h',  ms: 60 * 60_000,      n: 36 },
+  { label: '1D',  ms: 24 * 60 * 60_000, n: 30 },
+];
+const ONE_DAY = 24 * 60 * 60_000;
+
 function computePrice(ms: number): number {
   const t  = ms / 60_000;
   const s1 = Math.sin(t / 47.3) * 6.8;
@@ -46,15 +57,15 @@ function computePrice(ms: number): number {
   return Math.max(FB_LOW + 1, Math.min(FB_HIGH - 1, FB_BASE + s1 + s2 + s3));
 }
 
-function buildFallbackCandles(livePrice: number): Candle[] {
+function buildFallbackCandles(livePrice: number, intervalMs = INTERVAL, n = N_FALLBACK): Candle[] {
   const now      = Date.now();
-  const curStart = Math.floor(now / INTERVAL) * INTERVAL;
+  const curStart = Math.floor(now / intervalMs) * intervalMs;
   const result: Candle[] = [];
 
-  for (let i = N_FALLBACK - 1; i >= 0; i--) {
-    const t0    = curStart - i * INTERVAL;
-    const t1    = t0 + INTERVAL;
-    const open  = i === N_FALLBACK - 1
+  for (let i = n - 1; i >= 0; i--) {
+    const t0    = curStart - i * intervalMs;
+    const t1    = t0 + intervalMs;
+    const open  = i === n - 1
       ? computePrice(t0)
       : result[result.length - 1]?.close ?? computePrice(t0);
     const close = i === 0 ? livePrice : computePrice(t1);
@@ -78,8 +89,8 @@ function fmt(n: number, d = 2) {
 const PL = 62, PR = 62, PT = 14, PB = 22;
 
 function CandleChart({
-  candles, livePrice, isUp, locale,
-}: { candles: Candle[]; livePrice: number; isUp: boolean; locale: string }) {
+  candles, livePrice, isUp, locale, intervalMs,
+}: { candles: Candle[]; livePrice: number; isUp: boolean; locale: string; intervalMs: number }) {
   const wrapRef  = useRef<HTMLDivElement>(null);
   const [svgW, setSvgW] = useState(900);
   const PRICE_H = 272;
@@ -211,8 +222,9 @@ function CandleChart({
         {candles.map((c, i) => {
           if (i % Math.max(1, Math.floor(n / 6)) !== 0) return null;
           const t = new Date(c.time);
-          const lbl = t.toLocaleTimeString(locale,
-            { hour: '2-digit', minute: '2-digit', hour12: false });
+          const lbl = intervalMs >= ONE_DAY
+            ? t.toLocaleDateString(locale, { day: '2-digit', month: 'short' })
+            : t.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false });
           return (
             <text key={`xl${c.time}`}
               x={cx(i)} y={PT + ch + 14}
@@ -245,7 +257,10 @@ export default function StockChart() {
   const [candles,    setCandles]    = useState<Candle[]>([]);
   const [realCandles, setRealCandles] = useState<Candle[]>([]);
   const [flash,      setFlash]      = useState(false);
+  const [tfLabel,    setTfLabel]    = useState('5m');
   const prevPrice = useRef<number | null>(null);
+
+  const timeframe = TIMEFRAMES.find(tf => tf.label === tfLabel) ?? TIMEFRAMES[1];
 
   // Live price — refresh every 15 s
   useEffect(() => {
@@ -282,10 +297,11 @@ export default function StockChart() {
     return () => clearInterval(id);
   }, []);
 
-  // Merge: use real candles when available, update the last one with live price
+  // Merge: for the native 5m timeframe use real candles when available; other
+  // timeframes are synthesized at their interval. Last candle tracks live price.
   useEffect(() => {
     if (!data) return;
-    if (realCandles.length > 0) {
+    if (timeframe.label === '5m' && realCandles.length > 0) {
       const merged = [...realCandles];
       merged[merged.length - 1] = {
         ...merged[merged.length - 1],
@@ -295,9 +311,9 @@ export default function StockChart() {
       };
       setCandles(merged);
     } else {
-      setCandles(buildFallbackCandles(data.price));
+      setCandles(buildFallbackCandles(data.price, timeframe.ms, timeframe.n));
     }
-  }, [data, realCandles]);
+  }, [data, realCandles, timeframe.label, timeframe.ms, timeframe.n]);
 
   if (!data) {
     return (
@@ -336,16 +352,18 @@ export default function StockChart() {
             </span>
           </div>
 
-          {/* Timeframe selector (visual only — chart always shows 5 m) */}
+          {/* Timeframe selector */}
           <div className="flex items-center gap-1">
-            {['1m','5m','15m','1h','1D'].map(tf => (
-              <button key={tf}
+            {TIMEFRAMES.map(tf => (
+              <button key={tf.label}
+                onClick={() => setTfLabel(tf.label)}
+                aria-pressed={tf.label === tfLabel}
                 className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-                  tf === '5m'
+                  tf.label === tfLabel
                     ? 'bg-cyan-900/40 text-cyan-400 border border-cyan-800/50'
-                    : 'text-slate-700 hover:text-slate-400'
+                    : 'text-slate-500 hover:text-slate-300'
                 }`}>
-                {tf}
+                {tf.label}
               </button>
             ))}
           </div>
@@ -389,7 +407,7 @@ export default function StockChart() {
           {/* Chart */}
           <div className="flex-1 min-w-0 rounded-lg overflow-hidden border border-slate-800/60
                           bg-[#020810]">
-            <CandleChart candles={candles} livePrice={data.price} isUp={isUp} locale={locale} />
+            <CandleChart candles={candles} livePrice={data.price} isUp={isUp} locale={locale} intervalMs={timeframe.ms} />
           </div>
         </div>
 
