@@ -12,6 +12,7 @@ import SpaceXGallery from './components/SpaceXGallery';
 import InvestmentParams from './components/InvestmentParams';
 import ProfitCalculator from './components/ProfitCalculator';
 import DemandBoard from './components/DemandBoard';
+import StockTicker from './components/StockTicker';
 import Footer from './components/Footer';
 import ToastNotifications from './components/ToastNotifications';
 import VerifyPage from './components/VerifyPage';
@@ -42,6 +43,7 @@ function HomePage() {
       </div>
       <main>
         <Hero />
+        <StockTicker />
         <Inventory />
         <MissionManifest />
         <SpaceXGallery />
