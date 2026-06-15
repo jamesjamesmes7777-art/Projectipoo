@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 
-const TOTAL = 12_820_512;
+const TOTAL = 17_820_512; // original 12,820,512 + 5,000,000 additional acquisition
 
 export interface InventoryState {
   total: number;

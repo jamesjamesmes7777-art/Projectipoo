@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Users, TrendingUp, Package } from 'lucide-react';
+import { Users, TrendingUp, Package, Info } from 'lucide-react';
 import { useLang } from '../context/LangContext';
 import { useInventory } from '../context/InventoryContext';
 import { useCountUp } from '../hooks/useCountUp';
@@ -169,6 +169,18 @@ export default function Inventory() {
             delay={300}
             fmtNum={fmtNum}
           />
+        </div>
+
+        {/* Additional acquisition notice */}
+        <div className="flex items-start gap-3 px-4 py-3 mb-6 rounded-xl border border-cyan-500/20 bg-cyan-500/5">
+          <Info className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-slate-300 leading-relaxed">
+            <span className="font-semibold text-cyan-400">Additional Acquisition — </span>
+            Due to exceptionally high investor demand, Omni Wealth Ltd has secured an additional{' '}
+            <span className="font-semibold text-white">5,000,000 SPCX shares</span>, bringing total shares under
+            management to <span className="font-semibold text-white">17,820,512</span>.
+            Existing allocation requests will be fulfilled in full.
+          </p>
         </div>
 
         {/* Allocation Progress */}

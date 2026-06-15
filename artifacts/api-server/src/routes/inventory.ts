@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 
 const router: IRouter = Router();
 
-const TOTAL = 12_820_512;
+const TOTAL = 17_820_512; // original 12,820,512 + 5,000,000 additional acquisition
 const START_ALLOCATED = 7_900_219;
 const START_INVESTORS = 7_243;
 const DEADLINE_INVESTORS = 8_850;
