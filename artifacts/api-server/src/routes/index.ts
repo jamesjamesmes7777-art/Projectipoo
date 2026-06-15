@@ -5,6 +5,7 @@ import certificatesRouter from "./certificates";
 import adminRouter from "./admin";
 import inventoryRouter from "./inventory";
 import stockPriceRouter from "./stockPrice";
+import stockCandlesRouter from "./stockCandles";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(certificatesRouter);
 router.use(adminRouter);
 router.use(inventoryRouter);
 router.use(stockPriceRouter);
+router.use(stockCandlesRouter);
 
 export default router;

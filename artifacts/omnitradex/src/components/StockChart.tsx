@@ -29,43 +29,40 @@ interface StockData {
   lastUpdated: string;
 }
 
-/* ── Price formula (must mirror server) ─────────────────── */
-const BASE_P    = 160.95;
-const DAY_LOW   = 149.34;
-const DAY_HIGH  = 176.52;
+/* ── Sine-wave fallback (mirrors server, used until real candles load) */
+const FB_BASE   = 160.95;
+const FB_LOW    = 149.34;
+const FB_HIGH   = 176.52;
 const INTERVAL  = 5 * 60_000;
-const N_CANDLES = 40;
+const N_FALLBACK = 40;
 
 function computePrice(ms: number): number {
   const t  = ms / 60_000;
   const s1 = Math.sin(t / 47.3) * 6.8;
   const s2 = Math.sin(t / 7.9)  * 2.1;
   const s3 = Math.sin(t / 1.8)  * 0.55;
-  const raw = BASE_P + s1 + s2 + s3;
-  return Math.max(DAY_LOW + 1, Math.min(DAY_HIGH - 1, raw));
+  return Math.max(FB_LOW + 1, Math.min(FB_HIGH - 1, FB_BASE + s1 + s2 + s3));
 }
 
-function buildCandles(livePrice: number): Candle[] {
+function buildFallbackCandles(livePrice: number): Candle[] {
   const now      = Date.now();
   const curStart = Math.floor(now / INTERVAL) * INTERVAL;
   const result: Candle[] = [];
 
-  for (let i = N_CANDLES - 1; i >= 0; i--) {
+  for (let i = N_FALLBACK - 1; i >= 0; i--) {
     const t0    = curStart - i * INTERVAL;
     const t1    = t0 + INTERVAL;
-    const open  = i === N_CANDLES - 1
+    const open  = i === N_FALLBACK - 1
       ? computePrice(t0)
       : result[result.length - 1]?.close ?? computePrice(t0);
     const close = i === 0 ? livePrice : computePrice(t1);
-
     const seed  = (t0 / 1000) % 1_000_000;
     const wickU = Math.abs(Math.sin(seed * 1.31 + 0.7)) * 2.2 + 0.35;
     const wickD = Math.abs(Math.sin(seed * 0.87 + 1.1)) * 2.2 + 0.35;
     const high  = Math.max(open, close) + wickU;
     const low   = Math.min(open, close) - wickD;
-    const vol   = Math.round(60_000 + Math.abs(Math.sin(seed * 2.1)) * 350_000 +
-                             Math.abs(close - open) * 18_000);
-
+    const vol   = Math.round(60_000 + Math.abs(Math.sin(seed * 2.1)) * 350_000
+                             + Math.abs(close - open) * 18_000);
     result.push({ time: t0, open, high, low, close, volume: vol });
   }
   return result;
@@ -96,8 +93,11 @@ function CandleChart({
     return () => ob.disconnect();
   }, []);
 
-  const cw = svgW - PL - PR;
-  const ch = PRICE_H - PT - PB;
+  if (candles.length === 0) return <div ref={wrapRef} className="w-full" />;
+
+  const n   = candles.length;
+  const cw  = svgW - PL - PR;
+  const ch  = PRICE_H - PT - PB;
 
   const maxP = Math.max(...candles.map(c => c.high));
   const minP = Math.min(...candles.map(c => c.low));
@@ -106,7 +106,7 @@ function CandleChart({
   const lo   = minP - rng * 0.06;
 
   const py = (p: number) => PT + ch * (1 - (p - lo) / (hi - lo));
-  const slotW = cw / N_CANDLES;
+  const slotW = cw / n;
   const bodyW = Math.max(2, slotW * 0.58);
   const cx    = (i: number) => PL + i * slotW + slotW / 2;
 
@@ -127,8 +127,7 @@ function CandleChart({
     <div ref={wrapRef} className="w-full select-none overflow-hidden">
       <svg width={svgW} height={TOTAL_H} style={{ display: 'block' }}>
         {/* chart area bg */}
-        <rect x={PL} y={PT} width={cw} height={ch}
-          fill="rgba(2,6,23,0.7)" />
+        <rect x={PL} y={PT} width={cw} height={ch} fill="rgba(2,6,23,0.7)" />
 
         {/* Grid */}
         {grid.map((g, i) => (
@@ -152,13 +151,11 @@ function CandleChart({
           const bBot   = py(Math.min(c.open, c.close));
           const bH     = Math.max(1.5, bBot - bTop);
           const x      = cx(i);
-          const isLast = i === N_CANDLES - 1;
+          const isLast = i === n - 1;
           return (
             <g key={c.time}>
-              {/* wick */}
               <line x1={x} y1={py(c.high)} x2={x} y2={py(c.low)}
                 stroke={clr} strokeWidth="1.2" opacity={isLast ? 1 : 0.7} />
-              {/* body */}
               <rect x={x - bodyW / 2} y={bTop}
                 width={bodyW} height={bH}
                 fill={clr} fillOpacity={fillOp}
@@ -207,6 +204,22 @@ function CandleChart({
         {/* "VOL" label */}
         <text x={PL - 6} y={PRICE_H + 14} textAnchor="end"
           fill="#334155" fontSize="9" fontFamily="monospace">VOL</text>
+
+        {/* X-axis time labels (every ~8 candles) */}
+        {candles.map((c, i) => {
+          if (i % Math.max(1, Math.floor(n / 6)) !== 0) return null;
+          const t = new Date(c.time);
+          const lbl = t.toLocaleTimeString('en-US',
+            { hour: '2-digit', minute: '2-digit', hour12: false });
+          return (
+            <text key={`xl${c.time}`}
+              x={cx(i)} y={PT + ch + 14}
+              textAnchor="middle" fill="#334155"
+              fontSize="9" fontFamily="monospace">
+              {lbl}
+            </text>
+          );
+        })}
       </svg>
     </div>
   );
@@ -224,13 +237,15 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 
 /* ── Main export ─────────────────────────────────────────── */
 export default function StockChart() {
-  const [data,    setData]    = useState<StockData | null>(null);
-  const [candles, setCandles] = useState<Candle[]>([]);
-  const [flash,   setFlash]   = useState(false);
+  const [data,       setData]       = useState<StockData | null>(null);
+  const [candles,    setCandles]    = useState<Candle[]>([]);
+  const [realCandles, setRealCandles] = useState<Candle[]>([]);
+  const [flash,      setFlash]      = useState(false);
   const prevPrice = useRef<number | null>(null);
 
+  // Live price — refresh every 15 s
   useEffect(() => {
-    async function fetchData() {
+    async function fetchPrice() {
       try {
         const r = await fetch('/api/stock-price');
         if (!r.ok) return;
@@ -241,13 +256,44 @@ export default function StockChart() {
         }
         prevPrice.current = d.price;
         setData(d);
-        setCandles(buildCandles(d.price));
       } catch { /* ignore */ }
     }
-    fetchData();
-    const id = setInterval(fetchData, 15_000);
+    fetchPrice();
+    const id = setInterval(fetchPrice, 15_000);
     return () => clearInterval(id);
   }, []);
+
+  // Real candles — refresh every 60 s
+  useEffect(() => {
+    async function fetchCandleData() {
+      try {
+        const r = await fetch('/api/stock-candles');
+        if (!r.ok) return;
+        const { candles: c }: { candles: Candle[] } = await r.json();
+        if (c && c.length > 0) setRealCandles(c);
+      } catch { /* ignore */ }
+    }
+    fetchCandleData();
+    const id = setInterval(fetchCandleData, 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Merge: use real candles when available, update the last one with live price
+  useEffect(() => {
+    if (!data) return;
+    if (realCandles.length > 0) {
+      const merged = [...realCandles];
+      merged[merged.length - 1] = {
+        ...merged[merged.length - 1],
+        close: data.price,
+        high:  Math.max(merged[merged.length - 1].high, data.price),
+        low:   Math.min(merged[merged.length - 1].low,  data.price),
+      };
+      setCandles(merged);
+    } else {
+      setCandles(buildFallbackCandles(data.price));
+    }
+  }, [data, realCandles]);
 
   if (!data) {
     return (
@@ -263,6 +309,7 @@ export default function StockChart() {
   const isUp       = data.change >= 0;
   const priceColor = isUp ? 'text-emerald-400' : 'text-red-400';
   const TrendIcon  = isUp ? TrendingUp : TrendingDown;
+  const usingReal  = realCandles.length > 0;
 
   return (
     <section className="w-full bg-[#020408] border-y border-slate-800/50">
@@ -354,7 +401,10 @@ export default function StockChart() {
 
         {/* ── Footer ── */}
         <div className="mt-3 flex items-center justify-between text-[10px] text-slate-700">
-          <span>5-minute candles · {N_CANDLES} periods</span>
+          <span>
+            5-min candles · {candles.length} periods
+            {usingReal && <span className="ml-1.5 text-cyan-900">· live market data</span>}
+          </span>
           <span className="font-mono">
             Updated {new Date(data.lastUpdated).toLocaleTimeString('en-US',
               { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
