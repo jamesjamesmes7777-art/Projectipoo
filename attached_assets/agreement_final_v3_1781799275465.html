@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+    @page {
+        size: A4;
+        margin: 20mm 15mm 20mm 15mm;
+        @bottom-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 8pt;
+            color: #718096;
+        }
+        @bottom-left {
+            content: "OMNI WEALTH LTD • INVESTMENT & SETTLEMENT AGREEMENT";
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 8pt;
+            color: #718096;
+            font-weight: bold;
+        }
+    }
+    
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2d3748;
+        line-height: 1.6;
+        font-size: 10.5pt;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .header-container {
+        border-bottom: 2px solid #1a365d;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .company-title {
+        font-size: 24pt;
+        font-weight: bold;
+        color: #1a365d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0;
+    }
+    
+    .document-type {
+        font-size: 14pt;
+        color: #4a5568;
+        margin-top: 5px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .date-badge {
+        float: right;
+        background-color: #ebf8ff;
+        color: #2b6cb0;
+        padding: 4px 12px;
+        font-size: 9.5pt;
+        font-weight: bold;
+        border-radius: 4px;
+        margin-top: -35px;
+    }
+    
+    .section-title {
+        font-size: 13pt;
+        color: #1a365d;
+        border-left: 4px solid #2b6cb0;
+        padding-left: 10px;
+        margin-top: 25px;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        font-weight: bold;
+        page-break-after: avoid;
+    }
+    
+    .parties-table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+    }
+    
+    .parties-table td {
+        vertical-align: top;
+        width: 50%;
+        padding: 10px;
+        background-color: #f7fafc;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .party-label {
+        font-weight: bold;
+        color: #2b6cb0;
+        font-size: 9.5pt;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    
+    .party-details {
+        font-size: 10pt;
+    }
+    
+    .highlight-box {
+        background-color: #f0fff4;
+        border: 1px solid #c6f6d5;
+        border-left: 4px solid #38a169;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .highlight-box p {
+        margin: 0 0 8px 0;
+    }
+    
+    .highlight-box p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0 25px 0;
+    }
+    
+    .data-table th {
+        background-color: #1a365d;
+        color: #ffffff;
+        text-align: left;
+        padding: 10px 12px;
+        font-size: 10pt;
+        text-transform: uppercase;
+    }
+    
+    .data-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 10pt;
+    }
+    
+    .data-table tr:nth-child(even) td {
+        background-color: #f7fafc;
+    }
+    
+    .text-right {
+        text-align: right;
+    }
+    
+    .bold-total {
+        font-weight: bold;
+        color: #1a365d;
+        background-color: #edf2f7 !important;
+        border-top: 2px solid #1a365d;
+        border-bottom: 2px solid #1a365d;
+    }
+    
+    .green-text {
+        color: #38a169;
+        font-weight: bold;
+    }
+    
+    .signature-container {
+        margin-top: 40px;
+        width: 100%;
+        page-break-inside: avoid;
+    }
+    
+    .signature-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .signature-table td {
+        width: 50%;
+        padding: 20px 40px 10px 0;
+        vertical-align: top;
+    }
+    
+    .signature-line {
+        border-bottom: 1px solid #4a5568;
+        margin-top: 50px;
+        margin-bottom: 5px;
+    }
+    
+    .signature-title {
+        font-size: 9.5pt;
+        color: #4a5568;
+    }
+</style>
+</head>
+<body>
+
+<div class="header-container">
+    <div class="company-title">Omni Wealth Ltd</div>
+    <div class="document-type">Investment & Execution Settlement Agreement</div>
+    <div class="date-badge">June 18, 2026</div>
+</div>
+
+<p>
+    <strong>THIS INVESTMENT & SETTLEMENT AGREEMENT</strong> (the "Agreement") is formally entered into and made effective as of the date written above, by and between the following contracting parties:
+</p>
+
+<table class="parties-table">
+    <tr>
+        <td>
+            <div class="party-label">The Firm</div>
+            <div class="party-details">
+                <strong>OMNI WEALTH LTD</strong><br>
+                Legally represented by:<br>
+                <strong>Simon Mark Hickman</strong>, Chief Executive Officer
+            </div>
+        </td>
+        <td>
+            <div class="party-label">The Client</div>
+            <div class="party-details">
+                <strong>GEORGIOS KRIARAKIS</strong><br>
+                Address: Leof. Emmanouil Pachla 89, Rethymno<br>
+                Email: <span style="color: #2b6cb0;">gkriara@gmail.com</span><br>National ID / Passport No: ____________________
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div class="section-title">1. Purpose & Capital Structure</div>
+<p>
+    The Client wishes to allocate investment capital for the targeted asset acquisition of private equity allocation shares associated with the <strong>SpaceX-IPO</strong> project. This allocation is managed and protected under the technical asset administration framework and institutional recovery architecture of the Firm.
+</p>
+
+<div class="highlight-box">
+    <p><strong>Approved Capital Breakdown:</strong></p>
+    <table style="width:100%; font-size:10pt; border-collapse:collapse;">
+        <tr>
+            <td style="padding: 3px 0;">• Client Direct Cash Contribution:</td>
+            <td class="text-right" style="font-weight:bold;">&euro;20,000.00</td>
+        </tr>
+        <tr>
+            <td style="padding: 3px 0;">• Institutional Co-Investment Bonus (via strategic framework with <strong>Piraeus Bank S.A.</strong>):</td>
+            <td class="text-right" style="font-weight:bold;">&euro;6,325.00</td>
+        </tr>
+        <tr style="border-top: 1px solid #c6f6d5;">
+            <td style="padding: 6px 0 0 0; font-weight:bold; color:#276749;">Total Unified Capital Deployed:</td>
+            <td class="text-right" style="padding: 6px 0 0 0; font-weight:bold; color:#276749;">&euro;26,325.00</td>
+        </tr>
+    </table>
+</div>
+
+<div class="section-title">2. Asset Allocation & Entry Parameters</div>
+<p>
+    The transactional parameters are definitively locked in the ledger database based on the verified equity block configuration below:
+</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Asset Specification / Description</th>
+            <th class="text-right">Value / Metric</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Underlying Selected Asset Target</td>
+            <td class="text-right" style="font-weight: bold;">SpaceX-IPO Block</td>
+        </tr>
+        <tr>
+            <td>Allocated Volume (Number of Shares)</td>
+            <td class="text-right">225 Shares</td>
+        </tr>
+        <tr>
+            <td>Fixed Acquisition Entry Price</td>
+            <td class="text-right">&euro;117.00 / share</td>
+        </tr>
+        <tr>
+            <td>Locked Verified Offer Execution Price</td>
+            <td class="text-right">&euro;306.00 / share</td>
+        </tr>
+        <tr>
+            <td>Estimated Settlement Timeline</td>
+            <td class="text-right" style="font-weight: bold; color: #2b6cb0;">2–3 Weeks Maximum</td>
+        </tr>
+        <tr class="bold-total">
+            <td>Total Combined Capital Investment</td>
+            <td class="text-right">&euro;26,325.00</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="section-title">3. Financial Projections & Profit Sharing</div>
+<p>
+    Upon the official liquidation or qualified maturity event of the underlying target allocation at the standard designated exit parameter, the financial distribution model shall strictly process disbursements according to the following audited breakdown structure:
+</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Financial Distribution Milestone</th>
+            <th class="text-right">Amount (EUR)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Projected Gross Settlement Payout</td>
+            <td class="text-right" style="font-weight: bold;">&euro;68,850.00</td>
+        </tr>
+        <tr>
+            <td>Total Generated Gross Profit</td>
+            <td class="text-right class green-text" style="color: #2f855a;">&euro;42,525.00</td>
+        </tr>
+        <tr>
+            <td>Firm Contractual Performance Fee (17% on Gross Profit)</td>
+            <td class="text-right" style="color: #c53030;">-&euro;7,229.25</td>
+        </tr>
+        <tr>
+            <td>Net Client Net Profit Generation</td>
+            <td class="text-right green-text" style="color: #2f855a;">&euro;35,295.75</td>
+        </tr>
+        <tr class="bold-total">
+            <td>Total Final Disbursement Guaranteed to Client</td>
+            <td class="text-right" style="font-size: 11pt; color: #1a365d;">&euro;61,620.75</td>
+        </tr>
+    </tbody>
+</table>
+
+<p style="font-size: 10pt; text-align: center; background-color: #ebf8ff; color: #2b6cb0; padding: 8px; border-radius: 4px; font-weight: bold;">
+    PROJECTED NET PERFORMANCE METRIC: +134.1% GAIN ON CLIENT DEPLOYED CAPITAL
+</p>
+
+<div class="section-title">4. Terms of Liquidation & Execution</div>
+<ul>
+    <li><strong>Performance Fee Validation:</strong> The 17% Firm Performance Fee is exclusively success-contingent. It will be systematically deducted directly from the generated Gross Profit block upon execution of the exit position. No upfront fees are assessed to the Client for the institutional credit bonus.</li>
+    <li><strong>Disbursement Protocols:</strong> All final settled funds amounting to <strong>&euro;61,620.75</strong> will be routed directly via secure international SEPA/Swift remittance structures or verified cryptographic ledgers to the designated accounts of Georgios Kriarakis within 7 business days of position execution.</li>
+    <li><strong>Procedural Timeline:</strong> Due to accelerated administrative and banking clearance procedures, the complete asset exit and settlement process is scheduled to be finalized within a maximum period of two (2) to three (3) weeks from the date of execution.</li>
+</ul>
+
+<div class="signature-container">
+    <p style="font-size: 9.5pt; color: #4a5568; font-style: italic; margin-bottom: 25px;">
+        IN WITNESS WHEREOF, the parties hereto have executed and ratified this Investment Agreement on the day and year first written above.
+    </p>
+    
+    <table class="signature-table">
+        <tr>
+            <td>
+                <div class="party-label">For: Omni Wealth Ltd</div>
+                <div class="signature-line"></div>
+                <div class="signature-title"><strong>Simon Mark Hickman</strong></div>
+                <div class="signature-title">Chief Executive Officer</div>
+            </td>
+            <td>
+                <div class="party-label">For the Client</div>
+                <div class="signature-line"></div>
+                <div class="signature-title"><strong>Georgios Kriarakis</strong></div>
+                <div class="signature-title">ID/Passport No: ____________________</div>
+                <div class="signature-title">Account Holder / Investor</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
