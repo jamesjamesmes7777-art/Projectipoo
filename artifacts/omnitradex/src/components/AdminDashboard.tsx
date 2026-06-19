@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus, LogOut, Search, FileText, Download, CheckCircle, XCircle,
   RotateCcw, Trash2, Eye, Clock, ChevronRight, ShieldCheck, AlertTriangle, Filter,
-  ArrowUpDown, Link2, ExternalLink, X, Loader2,
+  ArrowUpDown, Link2, ExternalLink, X, Loader2, PenTool,
 } from 'lucide-react';
 import {
   getAllCertificates, createCertificate, updateCertificate,
@@ -12,6 +12,7 @@ import { generateQRDataUrl, exportCertificatePDF } from '../lib/pdfExport';
 import type { Certificate, AuditLog, ApprovalStatus } from '../lib/types';
 import CertificateForm from './CertificateForm';
 import CertificateView from './CertificateView';
+import AgreementGenerator from './AgreementGenerator';
 
 const STATUS_COLOR: Record<ApprovalStatus, string> = {
   DRAFT:    'text-slate-400 bg-slate-800 border-slate-700',
@@ -50,6 +51,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [selected, setSelected] = useState<Certificate | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<Certificate | undefined>();
+  const [showAgreementGen, setShowAgreementGen] = useState(false);
   const [qrUrl, setQrUrl] = useState('');
   const [exporting, setExporting] = useState(false);
   const [toasts, setToasts] = useState<AdminToast[]>([]);
@@ -124,6 +126,16 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       await navigator.clipboard.writeText(url);
       pushToast('success', 'Verification link copied');
+    } catch {
+      pushToast('error', 'Could not copy link');
+    }
+  }
+
+  async function handleCopyWlLink(cert: Certificate) {
+    const url = `${window.location.origin}/agreement/${cert.waiting_list_number}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      pushToast('success', `Agreement link copied — WL# ${cert.waiting_list_number}`);
     } catch {
       pushToast('error', 'Could not copy link');
     }
@@ -284,9 +296,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <p className="text-white text-sm font-semibold truncate">{cert.holder_name}</p>
-                        <span className={`flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[cert.approval_status]}`}>
-                          {cert.approval_status}
-                        </span>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          {cert.agreement_status === 'Generated' && (
+                            <span className="text-[9px] font-bold text-cyan-500 bg-cyan-500/10 rounded px-1.5 py-0.5 border border-cyan-500/20">AGR</span>
+                          )}
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${STATUS_COLOR[cert.approval_status]}`}>
+                            {cert.approval_status}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-slate-500 text-xs font-mono">{cert.reference_number}</p>
                       <div className="flex items-center gap-3 mt-1">
@@ -306,6 +323,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_COLOR[selected.approval_status]}`}>
                       {selected.approval_status}
                     </span>
+                    {selected.agreement_status === 'Generated' && selected.waiting_list_number && (
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full border text-cyan-400 bg-cyan-500/10 border-cyan-500/30">
+                        Agreement Generated · <span className="font-mono">{selected.waiting_list_number}</span>
+                      </span>
+                    )}
                     <div className="flex-1" />
 
                     {selected.approval_status === 'DRAFT' && (
@@ -332,11 +354,32 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <Eye className="w-3.5 h-3.5" />
                       Edit
                     </button>
+
+                    <button
+                      onClick={() => setShowAgreementGen(true)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+                        selected.agreement_status === 'Generated'
+                          ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                          : 'border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10'
+                      }`}>
+                      <PenTool className="w-3.5 h-3.5" />
+                      {selected.agreement_status === 'Generated' ? 'Edit Agreement' : 'Generate Agreement'}
+                    </button>
+
                     <button onClick={() => handleCopyLink(selected)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all">
                       <Link2 className="w-3.5 h-3.5" />
                       Copy link
                     </button>
+
+                    {selected.waiting_list_number && (
+                      <button onClick={() => handleCopyWlLink(selected)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-xs font-semibold transition-all">
+                        <Link2 className="w-3.5 h-3.5" />
+                        Copy WL link
+                      </button>
+                    )}
+
                     <a href={`/verify/${selected.reference_number}`} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-cyan-500/40 text-slate-300 hover:text-white text-xs font-semibold transition-all">
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -437,6 +480,20 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
         ))}
       </div>
 
+      {/* Agreement Generator Modal */}
+      {showAgreementGen && selected && (
+        <AgreementGenerator
+          cert={selected}
+          onGenerated={(updated) => {
+            setSelected(updated);
+            setCerts(prev => prev.map(c => c.id === updated.id ? updated : c));
+            setShowAgreementGen(false);
+            pushToast('success', `Agreement generated — WL# ${updated.waiting_list_number}`);
+          }}
+          onClose={() => setShowAgreementGen(false)}
+        />
+      )}
+
       {/* Certificate Form Modal */}
       {showForm && (
         <CertificateForm
@@ -499,6 +556,7 @@ function actionLabel(action: string): string {
     REJECTED: 'Certificate rejected',
     REVOKED: 'Certificate revoked',
     PENDING: 'Submitted for approval',
+    REQUESTED: 'Allocation requested',
   };
   return map[action] ?? action;
 }

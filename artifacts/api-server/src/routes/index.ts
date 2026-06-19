@@ -6,6 +6,7 @@ import adminRouter from "./admin";
 import inventoryRouter from "./inventory";
 import stockPriceRouter from "./stockPrice";
 import stockCandlesRouter from "./stockCandles";
+import agreementsRouter from "./agreements";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(adminRouter);
 router.use(inventoryRouter);
 router.use(stockPriceRouter);
 router.use(stockCandlesRouter);
+router.use(agreementsRouter);
 
 export default router;

@@ -1,4 +1,5 @@
 export type ApprovalStatus = 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED';
+export type AgreementStatus = 'Draft' | 'Generated' | 'Signed';
 
 export interface Certificate {
   id: string;
@@ -25,6 +26,35 @@ export interface Certificate {
   updated_at: string;
   qr_url: string | null;
   pdf_url: string | null;
+  // Agreement fields
+  waiting_list_number: string | null;
+  national_id: string | null;
+  afm_tin: string | null;
+  banking_partner: string | null;
+  institutional_bonus_amount: number | null;
+  entry_price: number | null;
+  sale_price: number | null;
+  verified_buyer_id: string | null;
+  total_investment: number | null;
+  gross_payout: number | null;
+  gross_profit: number | null;
+  performance_fee: number | null;
+  net_profit: number | null;
+  total_disbursed: number | null;
+  net_return_pct: number | null;
+  agreement_status: AgreementStatus | null;
+  agreement_generated_at: string | null;
+}
+
+export interface AgreementConfig {
+  national_id?: string;
+  afm_tin?: string;
+  banking_partner?: string;
+  institutional_bonus_amount?: number;
+  entry_price?: number;
+  sale_price?: number;
+  verified_buyer_id?: string;
+  shares_override?: number;
 }
 
 export interface AuditLog {

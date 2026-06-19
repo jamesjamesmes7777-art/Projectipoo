@@ -1,4 +1,4 @@
-import type { Certificate, AuditLog, ApprovalStatus } from './types';
+import type { Certificate, AuditLog, ApprovalStatus, AgreementConfig } from './types';
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
@@ -116,4 +116,19 @@ export function generateIntegrityHash(ref: string, holder: string, shares: numbe
     hash += raw.charCodeAt(i).toString(16);
   }
   return hash.slice(0, 64);
+}
+
+export async function generateAgreement(id: string, config: AgreementConfig): Promise<Certificate> {
+  const { certificate } = await api<{ certificate: Certificate }>(
+    `/agreements/${encodeURIComponent(id)}/generate`,
+    { method: 'POST', body: JSON.stringify(config) },
+  );
+  return certificate;
+}
+
+export async function getAgreementByWaitingListNumber(wlNumber: string): Promise<Certificate | null> {
+  const { agreement } = await api<{ agreement: Certificate | null }>(
+    `/agreements/waiting-list/${encodeURIComponent(wlNumber.trim().toUpperCase())}`,
+  );
+  return agreement;
 }

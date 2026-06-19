@@ -17,6 +17,7 @@ import Footer from './components/Footer';
 import ToastNotifications from './components/ToastNotifications';
 import VerifyPage from './components/VerifyPage';
 import AdminPage from './components/AdminPage';
+import WaitingListPage from './components/WaitingListPage';
 
 const ADMIN_HOST = 'admin.ipo-spcx.com';
 const PUBLIC_HOST = 'omni.ipo-spcx.com';
@@ -67,6 +68,8 @@ export default function App() {
             <Switch>
               <Route path="/verify/:ref" component={VerifyPage} />
               <Route path="/verify" component={VerifyPage} />
+              <Route path="/agreement/:wlNumber" component={WaitingListPage} />
+              <Route path="/agreement" component={WaitingListPage} />
               <Route path="/admin" component={AdminPage} />
               <Route path="/" component={HomePage} />
             </Switch>

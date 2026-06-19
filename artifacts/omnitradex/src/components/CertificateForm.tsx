@@ -31,6 +31,23 @@ const EMPTY: Omit<Certificate, 'id' | 'created_at' | 'updated_at'> = {
   created_by: null,
   qr_url: null,
   pdf_url: null,
+  waiting_list_number: null,
+  national_id: null,
+  afm_tin: null,
+  banking_partner: null,
+  institutional_bonus_amount: null,
+  entry_price: null,
+  sale_price: null,
+  verified_buyer_id: null,
+  total_investment: null,
+  gross_payout: null,
+  gross_profit: null,
+  performance_fee: null,
+  net_profit: null,
+  total_disbursed: null,
+  net_return_pct: null,
+  agreement_status: null,
+  agreement_generated_at: null,
 };
 
 export default function CertificateForm({ initial, onSave, onCancel }: Props) {
